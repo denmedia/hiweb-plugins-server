@@ -27,7 +27,7 @@ jQuery(document).ready(function ($) {
             success: function (data) {
                 if (typeof data != 'object' || !data.hasOwnProperty('result')) {
                     console.warn(data);
-                    $('#hw_plugins_server_remote_url_update').html('ERROR').addClass('button-disabled').attr('disabled','disabled');
+                    $('#hw_plugins_server_remote_url_update').html('ERROR').addClass('button-disabled').attr('disabled', 'disabled');
                 } else {
                     $('#hw_plugins_server_remote_url_update').html('DONE! REPEAT UPDATE').removeClass('button-primary');
                 }

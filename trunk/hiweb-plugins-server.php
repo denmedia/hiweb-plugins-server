@@ -22,6 +22,3 @@
 	require_once 'inc/options.php';
 	require_once 'inc/hooks.php';
 	require_once 'inc/script-styles.php';
-
-
-	if(!@is_dir(HW_PLUGINS_SERVER_ROOT)) { mkdir(HW_PLUGINS_SERVER_ROOT); }
