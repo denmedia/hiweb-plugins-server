@@ -64,7 +64,7 @@
 
 			<?php if ( is_array( $plugins ) ) {
 				foreach ( $plugins as $slug => $plugin ) :
-					$databasePlugin = hiweb_plugins_server()->get_database_plugin( $slug );
+					$databasePlugin = hiweb_plugins_server()->host()->get_plugin( $slug );
 					$isHosted = hiweb_plugins_server()->is_database_plugin_hosted( $slug );
 					?>
 					<tr class="<?php echo $isHosted ? 'active' : 'inactive'; ?>" data-slug="<?php echo dirname( $slug ) ?>" data-plugin="<?php echo $slug ?>">

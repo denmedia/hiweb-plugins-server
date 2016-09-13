@@ -22,3 +22,7 @@
 	require_once 'inc/options.php';
 	require_once 'inc/hooks.php';
 	require_once 'inc/script-styles.php';
+
+
+	//todo
+	hiweb_plugins_server()->local()->plugin('hiweb-core-2/hiweb-core-2.php');

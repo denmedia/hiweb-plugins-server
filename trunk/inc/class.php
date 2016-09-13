@@ -7,29 +7,28 @@
 	 */
 
 
-	if ( ! class_exists( 'hiweb_plugins_server' ) ) {
+	if ( ! class_exists( 'hw_plugins_server' ) ){
 
-		function hiweb_plugins_server() {
+		function hiweb_plugins_server(){
 			static $class;
-			if ( ! $class instanceof hiweb_plugins_server ) {
-				$class = new hiweb_plugins_server();
+			if ( ! $class instanceof hw_plugins_server ){
+				$class = new hw_plugins_server();
 			}
 
 			return $class;
 		}
 
 
-		class hiweb_plugins_server {
-
+		class hw_plugins_server{
 
 			/**
 			 * Возвращает класс для работы локального клиента
-			 * @return hiweb_plugins_server_client
+			 * @return hw_plugins_server_local
 			 */
-			public function client() {
+			public function local(){
 				static $class;
-				if ( ! $class instanceof hiweb_plugins_server_client ) {
-					$class = new hiweb_plugins_server_client();
+				if ( ! $class instanceof hw_plugins_server_local ){
+					$class = new hw_plugins_server_local();
 				}
 
 				return $class;
@@ -38,12 +37,12 @@
 
 			/**
 			 * Возвращает класс для работы локального хоста
-			 * @return hiweb_plugins_server_host
+			 * @return hw_plugins_server_host
 			 */
-			public function host() {
+			public function host(){
 				static $class;
-				if ( ! $class instanceof hiweb_plugins_server_host ) {
-					$class = new hiweb_plugins_server_host();
+				if ( ! $class instanceof hw_plugins_server_host ){
+					$class = new hw_plugins_server_host();
 				}
 
 				return $class;
@@ -52,12 +51,12 @@
 
 			/**
 			 * Возвращает класс для работы удаленного хоста
-			 * @return hiweb_plugins_server_remote_host
+			 * @return hw_plugins_server_remote_host
 			 */
-			public function remote_host() {
+			public function remote_host(){
 				static $class;
-				if ( ! $class instanceof hiweb_plugins_server_remote_host ) {
-					$class = new hiweb_plugins_server_remote_host();
+				if ( ! $class instanceof hw_plugins_server_remote_host ){
+					$class = new hw_plugins_server_remote_host();
 				}
 
 				return $class;
@@ -67,7 +66,7 @@
 			/**
 			 *
 			 */
-			public function remote_client() {
+			public function remote_client(){
 				//todo!!!
 			}
 
@@ -76,31 +75,31 @@
 			 * Возвращает класс для работы с хуками
 			 * @return hw_plugins_server_hooks
 			 */
-			public function hooks() {
+			public function hooks(){
 				static $class;
-				if ( ! $class instanceof hw_plugins_server_hooks ) {
+				if ( ! $class instanceof hw_plugins_server_hooks ){
 					$class = new hw_plugins_server_hooks();
 				}
 				return $class;
 			}
 
 
-			public function do_server_plugin_hosted( $slug, $hosted = true ) {
+			public function do_server_plugin_hosted( $slug, $hosted = true ){
 				$data            = get_plugin_data( $slug );
 				$archiveFileName = md5( $slug ) . '.zip';
 				$archivePath     = HW_PLUGINS_SERVER_ROOT . '/' . $archiveFileName;
 				$pluginFiles     = get_plugin_files( $slug );
 
-				if ( file_exists( $archivePath ) ) {
+				if ( file_exists( $archivePath ) ){
 					@unlink( $archivePath );
 				}
 
 				$zip = new ZipArchive();
 				$zip->open( $archivePath, ZipArchive::CREATE | ZipArchive::OVERWRITE );
 
-				foreach ( $pluginFiles as $file ) {
+				foreach ( $pluginFiles as $file ){
 					$path = WP_PLUGIN_DIR . '/' . $file;
-					if ( ! is_dir( $path ) ) {
+					if ( ! is_dir( $path ) ){
 						$zip->addFile( $path, $file );
 					}
 				}
@@ -121,19 +120,19 @@
 			 *
 			 * @return bool|int
 			 */
-			public function do_remote_download_plugin( $slug, $url = null ) {
+			public function do_remote_download_plugin( $slug, $url = null ){
 				$remote_plugins = $this->get_remote_data( $url );
-				if ( ! is_array( $remote_plugins ) ) {
+				if ( ! is_array( $remote_plugins ) ){
 					return - 1;
 				}
-				if ( ! $remote_plugins['status'] ) {
+				if ( ! $remote_plugins['status'] ){
 					return - 2;
 				}
-				if ( ! isset( $remote_plugins['plugins'][ $slug ] ) ) {
+				if ( ! isset( $remote_plugins['plugins'][ $slug ] ) ){
 					return - 3;
 				}
 				$remote_plugin = $remote_plugins['plugins'][ $slug ];
-				if ( ! isset( $remote_plugin['archive_name'] ) || trim( $remote_plugin['archive_name'] ) == '' ) {
+				if ( ! isset( $remote_plugin['archive_name'] ) || trim( $remote_plugin['archive_name'] ) == '' ){
 					return - 4;
 				}
 				$url = $remote_plugins['archives_url'] . '/' . $remote_plugin['archive_name'];
@@ -144,7 +143,7 @@
 				///Unpack
 				$zip = new ZipArchive;
 				$res = $zip->open( $local_archive );
-				if ( $res !== true ) {
+				if ( $res !== true ){
 					return - 5;
 				}
 				$R = $zip->extractTo( WP_PLUGIN_DIR );
@@ -161,9 +160,9 @@
 			 *
 			 * @return int|null|WP_Error
 			 */
-			public function do_activate( $slug ) {
-				if ( ! $this->is_plugin_exists( $slug ) ) {
-					if ( $this->do_remote_download_plugin( $slug ) !== true ) {
+			public function do_activate( $slug ){
+				if ( ! $this->is_plugin_exists( $slug ) ){
+					if ( $this->do_remote_download_plugin( $slug ) !== true ){
 						return - 1;
 					}
 				}
@@ -179,8 +178,8 @@
 			 *
 			 * @return bool
 			 */
-			public function do_deactivate( $slug ) {
-				if ( ! $this->is_plugin_exists( $slug ) ) {
+			public function do_deactivate( $slug ){
+				if ( ! $this->is_plugin_exists( $slug ) ){
 					return true;
 				}
 				deactivate_plugins( $slug );
@@ -195,14 +194,14 @@
 			 *
 			 * @return bool
 			 */
-			public function do_remove_plugin( $slug ) {
-				if ( ! $this->is_plugin_exists( $slug ) ) {
+			public function do_remove_plugin( $slug ){
+				if ( ! $this->is_plugin_exists( $slug ) ){
 					return true;
 				}
 				$this->do_deactivate( $slug );
-				if ( strpos( $slug, '/' ) !== false ) {
+				if ( strpos( $slug, '/' ) !== false ){
 					return $this->do_removeDir( WP_PLUGIN_DIR . '/' . dirname( $slug ) );
-				} else {
+				}else{
 					return $this->do_removeDir( WP_PLUGIN_DIR . '/' . $slug );
 				}
 			}
@@ -212,18 +211,18 @@
 			 *
 			 * @return bool
 			 */
-			private function do_removeDir( $dirPath ) {
-				if ( ! is_dir( $dirPath ) ) {
+			private function do_removeDir( $dirPath ){
+				if ( ! is_dir( $dirPath ) ){
 					throw new InvalidArgumentException( "$dirPath must be a directory" );
 				}
-				if ( substr( $dirPath, strlen( $dirPath ) - 1, 1 ) != '/' ) {
+				if ( substr( $dirPath, strlen( $dirPath ) - 1, 1 ) != '/' ){
 					$dirPath .= '/';
 				}
 				$files = glob( $dirPath . '*', GLOB_MARK );
-				foreach ( $files as $file ) {
-					if ( is_dir( $file ) ) {
+				foreach ( $files as $file ){
+					if ( is_dir( $file ) ){
 						$this->do_removeDir( $file );
-					} else {
+					}else{
 						unlink( $file );
 					}
 				}
@@ -237,7 +236,7 @@
 			 *
 			 * @return bool
 			 */
-			public function is_plugin_active( $slug ) {
+			public function is_plugin_active( $slug ){
 				include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
 				return is_plugin_active( $slug );
@@ -250,7 +249,7 @@
 			 *
 			 * @return bool
 			 */
-			public function is_plugin_exists( $slug ) {
+			public function is_plugin_exists( $slug ){
 				return file_exists( WP_PLUGIN_DIR . '/' . $slug );
 			}
 
@@ -261,12 +260,12 @@
 			 *
 			 * @return int|mixed
 			 */
-			public function get_plugin_version( $slug ) {
-				if ( ! $this->is_plugin_exists( $slug ) ) {
+			public function get_plugin_version( $slug ){
+				if ( ! $this->is_plugin_exists( $slug ) ){
 					return - 1;
 				}
 				$plugin = get_plugin_data( WP_PLUGIN_DIR . '/' . $slug );
-				if ( ! is_array( $plugin ) || ! isset( $plugin['Version'] ) || trim( $plugin['Version'] ) == '' ) {
+				if ( ! is_array( $plugin ) || ! isset( $plugin['Version'] ) || trim( $plugin['Version'] ) == '' ){
 					return - 2;
 				}
 
@@ -280,35 +279,40 @@
 		 * Класс для работы локального клиента
 		 * Class hiweb_plugins_server_client
 		 */
-		class hiweb_plugins_server_client {
+		class hw_plugins_server_local{
 
+			/** @var  hw_plugins_server_plugin[] */
 			private $plugins;
+			private $wp_plugins;
 
-			public function plugins() {
-				if ( is_array( $this->plugins ) ) {
-					return $this->plugins;
-				}
-				///
+
+			public function __construct(){
 				require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
-				$plugins = get_plugins();
-				if ( is_array( $plugins ) ) {
-					foreach ( $plugins as $slug => $plugin ) {
-						$pluginObject = new hiweb_plugins_server_plugin( $slug );
-						$pluginObject->set_data( $plugin );
-						$this->plugins[ $slug ] = $pluginObject;
-					}
-				}
-				return $this->plugins;
+				$this->wp_plugins = get_plugins();
 			}
 
 
-			public function plugin( $slug ) {
-				$plugins = $this->plugins();
-				if ( isset( $plugins[ $slug ] ) ) {
-					return $plugins[ $slug ];
-				} else {
-					return new hiweb_plugins_server_plugin( $slug );
+			public function plugin( $slug ){
+				if ( ! isset( $this->plugins[ $slug ] ) ){
+					$this->plugins[ $slug ] = new hw_plugins_server_plugin( $slug );
+					if(isset($this->wp_plugins[$slug])){
+						$this->plugins[ $slug ]->set_data($this->wp_plugins[$slug]);
+					}
 				}
+				return $this->plugins[ $slug ];
+			}
+
+			/**
+			 * @return array|hw_plugins_server_plugin[]
+			 */
+			public function plugins(){
+				$R = array();
+				if ( is_array( $this->wp_plugins ) ){
+					foreach ( $this->wp_plugins as $slug => $plugin ){
+						$R[ $slug ] = $this->plugin( $slug );
+					}
+				}
+				return $R;
 			}
 
 
@@ -318,7 +322,7 @@
 		 * Класс для работы локального хоста
 		 * Class hiweb_plugins_server_host
 		 */
-		class hiweb_plugins_server_host {
+		class hw_plugins_server_host{
 
 			/** @var bool */
 			private $status = false;
@@ -326,7 +330,7 @@
 			private $kickback_status = false;
 
 
-			public function __construct() {
+			public function __construct(){
 				$this->status          = ! ( get_option( HW_PLUGINS_SERVER_OPTIONS_STATUS, '0' ) == '0' );
 				$this->kickback_status = ! ( get_option( HW_PLUGINS_SERVER_OPTIONS_KICKBACK_STATUS, '0' ) == '0' );
 			}
@@ -336,13 +340,13 @@
 			 * Возвращает статус сервера. TRUE - сервер включен
 			 * @return bool
 			 */
-			public function get_status() {
+			public function get_status(){
 				return $this->status;
 			}
 
 
-			public function set_status( $new_status = true ) {
-				$this->status = (bool) $new_status;
+			public function set_status( $new_status = true ){
+				$this->status = (bool)$new_status;
 				return update_option( HW_PLUGINS_SERVER_OPTIONS_STATUS, $new_status ? '1' : '0' );
 			}
 
@@ -350,7 +354,7 @@
 			 * Переключает статус сервера
 			 * @return bool
 			 */
-			public function toggle_status() {
+			public function toggle_status(){
 				$this->status = ! $this->status;
 				return $this->set_status( $this->status );
 			}
@@ -359,12 +363,12 @@
 			 * Возвращает статус KICKBACK сервера. TRUE - сервер включен
 			 * @return bool
 			 */
-			public function get_kickback_status() {
+			public function get_kickback_status(){
 				return ( $this->get_status() && $this->kickback_status );
 			}
 
 
-			public function set_kickback_status( $new_status = false ) {
+			public function set_kickback_status( $new_status = false ){
 				$this->kickback_status = $new_status;
 				return update_option( HW_PLUGINS_SERVER_OPTIONS_KICKBACK_STATUS, $this->kickback_status ? '1' : '0' );
 			}
@@ -373,7 +377,7 @@
 			 * Переключает статус KICKBACK сервера
 			 * @return bool
 			 */
-			public function toggle_kickback_status() {
+			public function toggle_kickback_status(){
 				$this->kickback_status = ! $this->get_kickback_status();
 				return $this->set_kickback_status( $this->kickback_status );
 			}
@@ -385,12 +389,12 @@
 			 *
 			 * @return array
 			 */
-			public function get_plugins( $onlyHosted = true ) {
+			public function get_plugins( $onlyHosted = true ){
 				$database = $this->get_database();
 				$plugins  = get_plugins();
 				$R        = array();
-				foreach ( $database as $slug => $plugin ) {
-					if ( ( ! $onlyHosted || $plugin['hosted'] == 1 ) && isset( $plugins[ $slug ] ) ) {
+				foreach ( $database as $slug => $plugin ){
+					if ( ( ! $onlyHosted || $plugin['hosted'] == 1 ) && isset( $plugins[ $slug ] ) ){
 						$R[ $slug ] = $plugins[ $slug ] + $plugin;
 					}
 				}
@@ -401,19 +405,19 @@
 			 * Читает данные архива плагинов
 			 * @return array|mixed|void
 			 */
-			public function get_database( $onlyHosted = true ) {
+			public function get_database( $onlyHosted = true ){
 				$database = get_option( HW_PLUGINS_SERVER_OPTIONS_DATABASE, array() );
-				if ( ! is_array( $database ) ) {
+				if ( ! is_array( $database ) ){
 					$database = array();
 				}
 				$R = array();
-				if ( $onlyHosted ) {
-					foreach ( $database as $slug => $plugin ) {
+				if ( $onlyHosted ){
+					foreach ( $database as $slug => $plugin ){
 						$R[ $slug ] = $plugin;
 					}
 
 					return $R;
-				} else {
+				}else{
 					return $database;
 				}
 			}
@@ -426,8 +430,8 @@
 			 *
 			 * @return bool
 			 */
-			public function set_database_plugins( $database ) {
-				if ( ! is_array( $database ) ) {
+			public function set_plugins( $database ){
+				if ( ! is_array( $database ) ){
 					$database = array();
 				}
 
@@ -442,14 +446,14 @@
 			 *
 			 * @return array|mixed|void
 			 */
-			public function update_database_plugin( $slug, $data ) {
+			public function update_plugin( $slug, $data ){
 				$database = $this->get_database_plugins();
-				if ( isset( $database[ $slug ] ) ) {
+				if ( isset( $database[ $slug ] ) ){
 					$data = array_merge( $database[ $slug ], $data );
 				}
 				$database[ $slug ]         = $data;
 				$database[ $slug ]['slug'] = $slug;
-				$this->set_database_plugins( $database );
+				$this->set_plugins( $database );
 
 				return $database;
 			}
@@ -461,9 +465,9 @@
 			 *
 			 * @return bool|mixed
 			 */
-			public function get_database_plugin( $slug ) {
+			public function get_plugin( $slug ){
 				$database = $this->get_plugins();
-				if ( ! isset( $database[ $slug ] ) ) {
+				if ( ! isset( $database[ $slug ] ) ){
 					return false;
 				}
 				$databasePlugin                 = $database[ $slug ];
@@ -476,24 +480,11 @@
 			}
 
 			/**
-			 * Возвращает TRUE, если плагин в архиве
-			 *
-			 * @param $slug
-			 *
-			 * @return bool
-			 */
-			public function is_database_plugin_hosted( $slug ) {
-				$pluginDatabase = $this->get_database_plugin( $slug );
-
-				return ! ( $pluginDatabase == false || $pluginDatabase['hosted'] == false );
-			}
-
-			/**
 			 * Очистить информацию об арзивах
 			 * @return bool
 			 */
-			private function clear_database() {
-				return $this->set_database_plugins( array() );
+			private function clear_database(){
+				return $this->set_plugins( array() );
 			}
 
 
@@ -503,7 +494,7 @@
 		 * Класс для работы с удаленным хостом
 		 * Class hiweb_plugins_server_remote_host
 		 */
-		class hiweb_plugins_server_remote_host {
+		class hw_plugins_server_remote_host{
 
 
 			/**
@@ -520,22 +511,22 @@
 			 *
 			 * @return int
 			 */
-			public function get_status( $url = null, $textual = false ) {
-				if ( ! is_string( $url ) ) {
+			public function get_status( $url = null, $textual = false ){
+				if ( ! is_string( $url ) ){
 					$url = get_option( HW_PLUGINS_SERVER_OPTIONS_REMOTE_URL, false );
 				}
-				if ( ! is_string( $url ) || strpos( $url, 'http' ) !== 0 ) {
+				if ( ! is_string( $url ) || strpos( $url, 'http' ) !== 0 ){
 					return $textual ? 'NO CONNECT' : - 1;
 				}
 				$response = file_get_contents( rtrim( $url, '/\\' ) . '/wp-admin/admin-ajax.php?action=hw_plugins_server_get' );
-				if ( ! is_string( $response ) ) {
+				if ( ! is_string( $response ) ){
 					return $textual ? 'NO CONNECT: ERROR' : - 2;
 				}
 				$data = json_decode( $response, true );
-				if ( json_last_error() != 0 ) {
+				if ( json_last_error() != 0 ){
 					return $textual ? 'NO CONNECT: RESPONSE IS NOT JSON' : - 3;
 				}
-				if ( ! isset( $data['status'] ) ) {
+				if ( ! isset( $data['status'] ) ){
 					return $textual ? 'NO CONNECT: STATUS NOT EXISTS' : - 4;
 				}
 
@@ -549,22 +540,22 @@
 			 *
 			 * @return array|int|mixed|object
 			 */
-			public function get_data( $url = null ) {
-				if ( ! is_string( $url ) ) {
+			public function get_data( $url = null ){
+				if ( ! is_string( $url ) ){
 					$url = get_option( HW_PLUGINS_SERVER_OPTIONS_REMOTE_URL, false );
 				}
-				if ( ! is_string( $url ) || strpos( $url, 'http' ) !== 0 ) {
+				if ( ! is_string( $url ) || strpos( $url, 'http' ) !== 0 ){
 					return - 1;
 				}
 				$response = file_get_contents( rtrim( $url, '/\\' ) . '/wp-admin/admin-ajax.php?action=hw_plugins_server_get' );
-				if ( ! is_string( $response ) ) {
+				if ( ! is_string( $response ) ){
 					return - 2;
 				}
 				$data = json_decode( $response, true );
-				if ( json_last_error() != 0 ) {
+				if ( json_last_error() != 0 ){
 					return - 3;
 				}
-				if ( ! isset( $data['status'] ) ) {
+				if ( ! isset( $data['status'] ) ){
 					return - 4;
 				}
 
@@ -578,14 +569,14 @@
 			 *
 			 * @return int
 			 */
-			public function get_plugins( $url = null ) {
+			public function get_plugins( $url = null ){
 				$data = $this->get_data( $url );
-				if ( ! isset( $data['status'] ) ) {
+				if ( ! isset( $data['status'] ) ){
 					return - 4;
 				}
-				if ( $data['status'] != true ) {
+				if ( $data['status'] != true ){
 					return $data['status'];
-				} else {
+				}else{
 					return $data['plugins'];
 				}
 			}
@@ -593,40 +584,58 @@
 		}
 
 
-		class hiweb_plugins_server_remote_client {
+		class hw_plugins_server_remote_client{
 
 		}
 
 
-		class hiweb_plugins_server_plugin {
+		class hw_plugins_server_plugin{
 
 			private $slug;
-			private $name;
-			private $author;
-			private $author_name;
-			private $description;
-			private $plugin_url;
+			public $Name;
+			public $Description;
+			public $PluginURI;
+			public $Version;
 
-			private $client_path = array();
-			private $host_path = array();
+			private $set_data_allow_keys = array('Name','Description','PluginURI','Version');
 
 
-			public function __construct( $slug ) {
-
+			public function __construct( $slug, $data = array() ){
+				$this->slug;
+				$this->set_data($data);
 			}
 
-			public function set_data( $data ) {
-
+			/**
+			 * Установить данные
+			 *
+			 * @param $data
+			 *
+			 * @return array
+			 */
+			private function set_data( $data ){
+				$data = (array)$data;
+				$R = array();
+				foreach ($this->set_data_allow_keys as $key){
+					if(isset($data[$key])) {
+						$this->{$key} = $data[$key];
+						$R[$key] = $data[$key];
+					}
+				}
+				return $R;
 			}
 
-			public function client_exists( $version = null ) {
-				if(is_null($version)) return (count($this->client_path) > 0);
-				else return isset($this->client_path[$version]);
-			}
-
-			public function host_exists( $version = null ) {
-				if(is_null($version)) return (count($this->host_path) > 0);
-				else return isset($this->host_path[$version]);
+			/**
+			 * Возвращает данные плагина
+			 * @return array
+			 */
+			public function get_data(){
+				$R = array();
+				foreach ($this->set_data_allow_keys as $key){
+					if(property_exists($this,$key)) {
+						$R[$key] = $this->{$key};
+					}
+				}
+				return $R;
 			}
 
 		}
@@ -636,10 +645,10 @@
 		 * Класс для работы хуков WP
 		 * Class hw_plugins_server_hooks
 		 */
-		class hw_plugins_server_hooks {
+		class hw_plugins_server_hooks{
 
-			public function plugin_action_links( $links, $plugin ) {
-				if ( $plugin != 'hiweb-plugins-server/hiweb-plugins-server.php' ) {
+			public function plugin_action_links( $links, $plugin ){
+				if ( $plugin != 'hiweb-plugins-server/hiweb-plugins-server.php' ){
 					$links[] = '<a href=""><i class="dashicons dashicons-upload"></i> Upload To Server</a>';
 				}
 
@@ -647,21 +656,21 @@
 			}
 
 
-			public function plugin_action_links_settings( $links ) {
+			public function plugin_action_links_settings( $links ){
 				$links[] = '<a href="' . esc_url( get_admin_url( null, 'options-general.php?page=' . HW_PLUGINS_SERVER_OPTIONS_PAGE_SLUG ) ) . '">Client / Server Settings</a>';
 
 				return $links;
 			}
 
 
-			public function admin_notices() {
-				if ( get_current_screen()->base == 'plugins' ) {
+			public function admin_notices(){
+				if ( get_current_screen()->base == 'plugins' ){
 					ob_start();
 				}
 			}
 
-			public function pre_current_active_plugins() {
-				if ( get_current_screen()->base == 'plugins' ) {
+			public function pre_current_active_plugins(){
+				if ( get_current_screen()->base == 'plugins' ){
 					$html   = ob_get_clean();
 					$button = '<a href="' . self_admin_url( 'plugins.php?page=hiweb-plugins-server-remote' ) . '" title="Add New Plugin from hiWeb Remote Server" class="page-title-action">Add Remote Plugins</a>';
 					echo str_replace( '</h1>', $button . '</h1>', $html );
