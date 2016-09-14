@@ -283,7 +283,7 @@
 				$R = array();
 				foreach( scandir( HW_PLUGINS_SERVER_ROOT ) as $file ){
 					if( preg_match( '/(.zip)$/i', $file ) > 0 ){
-						$R[] = $this->plugin( $file );
+						$R[] = $this->plugin( HW_PLUGINS_SERVER_ROOT . '/' . $file );
 					}
 				}
 				return $R;
