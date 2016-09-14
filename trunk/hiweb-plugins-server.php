@@ -25,4 +25,5 @@
 
 
 	//todo
-	hiweb_plugins_server()->local()->plugin('hiweb-core-2/hiweb-core-2.php');
+    $plugins = hiweb_plugins_server()->host()->plugins();
+	hiweb()->console( $plugins );
