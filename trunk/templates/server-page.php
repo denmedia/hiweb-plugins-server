@@ -1,29 +1,30 @@
 <?php
-	_hw_plugins_server_script( '/templates/server-page' );
-	$hostedPlugins = hiweb_plugins_server()->host()->get_plugins( 1 );
-	$plugins       = get_plugins();
+    _hw_plugins_server_script( '/templates/server-page' );
+
+    $plugins       = hiweb_plugins_server()->plugins();
+    $hostedPlugins = hiweb_plugins_server()->host()->plugins();
 ?>
 <div class="wrap">
-	<h1>Host plugins on Server <!--<a href="" class="page-title-action">Host Selected Plugins</a>--></h1>
+    <h1>Host plugins on Server <!--<a href="" class="page-title-action">Host Selected Plugins</a>--></h1>
 
 
-	<h2 class="screen-reader-text">Filter plugins list</h2>
-	<ul class="subsubsub">
-		<li class="all"><a href="plugins.php?plugin_status=all" class="current">All <span class="count">(<?php echo count( $hostedPlugins ) . ' / ' . count( $plugins ); ?>)</span></a> | ...</li>
-		<!--<li class="hosted"><a href="plugins.php?plugin_status=active">Hosted <span class="count">(2)</span></a> |</li>
+    <h2 class="screen-reader-text">Filter plugins list</h2>
+    <ul class="subsubsub">
+        <li class="all"><a href="plugins.php?plugin_status=all" class="current">All <span class="count">(<?php echo count( $hostedPlugins ) . ' / ' . count( $plugins ); ?>)</span></a> | ...</li>
+        <!--<li class="hosted"><a href="plugins.php?plugin_status=active">Hosted <span class="count">(2)</span></a> |</li>
 		<li class="unhosted"><a href="plugins.php?plugin_status=inactive">Unhosted <span class="count">(16)</span></a> |</li>
 		<li class="upgrade"><a href="plugins.php?plugin_status=upgrade">Update Available <span class="count">(1)</span></a></li>-->
-	</ul>
-	<!--<form method="get">
+    </ul>
+    <!--<form method="get">
 		<p class="search-box">
 			<label class="screen-reader-text" for="plugin-search-input">Search Installed Plugins:</label>
 			<input type="search" id="plugin-search-input" name="s" value="">
 			<input type="submit" id="search-submit" class="button" value="Search Installed Plugins"></p>
 	</form>-->
 
-	<form method="post" id="bulk-action-form">
+    <form method="post" id="bulk-action-form">
 
-		<!--<input type="hidden" name="plugin_status" value="all">
+        <!--<input type="hidden" name="plugin_status" value="all">
 		<input type="hidden" name="paged" value="1">
 
 
@@ -51,65 +52,82 @@
 		</div>
 		<h2 class="screen-reader-text">Plugins list</h2>-->
 
-		<table class="wp-list-table widefat plugins">
-			<thead>
-			<tr>
-				<td id="cb" class="manage-column column-cb check-column"><!--<label class="screen-reader-text" for="cb-select-all-1">Select All</label><input id="cb-select-all-1" type="checkbox">--></td>
-				<th scope="col" id="name" class="manage-column column-name column-primary">Plugin</th>
-				<th scope="col" id="description" class="manage-column column-description">Description</th>
-			</tr>
-			</thead>
+        <table class="wp-list-table widefat plugins">
+            <thead>
+            <tr>
+                <td id="cb" class="manage-column column-cb check-column"><!--<label class="screen-reader-text" for="cb-select-all-1">Select All</label><input id="cb-select-all-1" type="checkbox">--></td>
+                <th scope="col" id="name" class="manage-column column-name column-primary">Plugin</th>
+                <th scope="col" id="description" class="manage-column column-description">Description</th>
+            </tr>
+            </thead>
 
-			<tbody id="the-list">
+            <tbody id="the-list">
 
-			<?php if ( is_array( $plugins ) ) {
-				foreach ( $plugins as $slug => $plugin ) :
-					$databasePlugin = hiweb_plugins_server()->host()->get_plugin( $slug );
-					$isHosted = hiweb_plugins_server()->is_database_plugin_hosted( $slug );
-					?>
-					<tr class="<?php echo $isHosted ? 'active' : 'inactive'; ?>" data-slug="<?php echo dirname( $slug ) ?>" data-plugin="<?php echo $slug ?>">
-						<th scope="row" class="check-column"><label class="screen-reader-text" for="checkbox_<?php echo md5( $slug ) ?>">Select <?php echo $plugin['Title']; ?></label>
-							<!--<input type="checkbox" name="checked[]" value="<?php echo $slug ?>" id="checkbox_<?php echo md5( $slug ) ?>">-->
-						</th>
-						<td class="plugin-title column-primary"><strong><?php echo $plugin['Title']; ?></strong>
-							<div class="row-actions visible">
+            <?php if ( is_array( $plugins ) ){
+                foreach ( $plugins as $slug => $plugin ) :
+                    $hostPlugin = hiweb_plugins_server()->host()->plugin( $slug );
+                    $localPlugin = hiweb_plugins_server()->local()->plugin( $slug );
+                    ?>
+                    <tr class="<?php echo $hostPlugin->is_hosted() ? 'active' : 'inactive'; ?>" data-slug="<?php echo dirname( $slug ) ?>" data-plugin="<?php echo $slug ?>">
+                        <th scope="row" class="check-column"><label class="screen-reader-text" for="checkbox_<?php echo md5( $slug ) ?>">Select <?php echo $hostPlugin->Name; ?></label>
+                            <!--<input type="checkbox" name="checked[]" value="<?php echo $slug ?>" id="checkbox_<?php echo md5( $slug ) ?>">-->
+                        </th>
+                        <td class="plugin-title column-primary"><strong><?php echo $hostPlugin->Name ?></strong>
+                            <div class="row-actions visible">
                             <span class="hosted">
-                                <?php if ( $isHosted ) : ?>
-	                                <a href="#" data-click="unhosted"><i class="dashicons dashicons-no-alt"></i> UnHosted</a> |
-                                    <a href="<?php echo $databasePlugin['archive_url'] ?>" title="Download Archive Plugin File To You'r PC..." target="_blank"><i class="dashicons dashicons-download"></i> Download To PC</a>
+                                <?php if ( $localPlugin->is_exists() ) : ?>
+                                    <?php if ( $hostPlugin->is_exists() ): ?>
+                                        <?php if ( $hostPlugin->is_hosted() ): ?>
+                                            <a href="#" data-click="install"><i class="dashicons dashicons-lightbulb"></i> Re-Install</a> |
+                                            <a href="#" data-click="unhosted"><i class="dashicons dashicons-dismiss"></i> UnHosted</a> |
+                                            <a href="<?php echo $plugin->url() ?>" title="Download Archive Plugin File To You'r PC..." target="_blank"><i class="dashicons dashicons-download"></i> Download To PC</a>
+                                        <?php else: ?>
+                                            <a href="#" data-click="host"><i class="dashicons dashicons-yes"></i> Host</a> |
+                                            <a href="#" data-click="install"><i class="dashicons dashicons-lightbulb"></i> Re-Install</a> |
+                                            <a href="<?php echo $plugin->url() ?>" title="Download Archive Plugin File To You'r PC..." target="_blank"><i class="dashicons dashicons-download"></i> Download To PC</a>
+                                        <?php endif; ?>
+                                    <?php else: ?>
+                                        <a href="#" data-click="host"><i class="dashicons dashicons-yes"></i> Put On Host</a>
+                                    <?php endif; ?>
                                 <?php else: ?>
-	                                <a href="#" data-click="hosted"><i class="dashicons dashicons-yes"></i> Put On Host</a>
-                                <?php endif ?>
+                                    <?php if ( $hostPlugin->is_exists() ): ?>
+                                        <?php if ( $hostPlugin->is_hosted() ): ?>
+                                            <a href="#" data-click="install"><i class="dashicons dashicons-lightbulb"></i> Re-Install</a> |
+                                            <a href="#" data-click="unhosted"><i class="dashicons dashicons-dismiss"></i> UnHosted</a> |
+                                            <a href="<?php echo $plugin->url() ?>" title="Download Archive Plugin File To You'r PC..." target="_blank"><i class="dashicons dashicons-download"></i> Download To PC</a>
+                                        <?php else: ?>
+                                            <a href="#" data-click="host"><i class="dashicons dashicons-yes"></i> Host</a> |
+                                            <a href="#" data-click="install"><i class="dashicons dashicons-lightbulb"></i> Re-Install</a> |
+                                            <a href="<?php echo $plugin->url() ?>" title="Download Archive Plugin File To You'r PC..." target="_blank"><i class="dashicons dashicons-download"></i> Download To PC</a>
+                                        <?php endif; ?>
+                                    <?php else: ?>
+
+                                    <?php endif; ?>
+                                <?php endif; ?>
                             </span>
-							</div>
-							<button type="button" class="toggle-row"><span class="screen-reader-text">Show more details</span></button>
-						</td>
-						<td class="column-description desc">
-							<div class="plugin-description"><p><?php echo $plugin['Description']; ?></p></div>
-							<div class="active second plugin-version-author-uri"><?php echo $plugin['Version']; ?> | By <?php if ( trim( $plugin['AuthorURI'] ) != '' ) : ?>
-								<a href="<?php echo $plugin['AuthorURI'] ?>">
-									<?php endif;
-										echo $plugin['AuthorName'];
-										if ( trim( $plugin['AuthorURI'] ) != '' ) : ?>
-								</a>
-							<?php endif; ?></div>
-						</td>
-					</tr>
-				<?php endforeach;
-			} ?>
-			</tbody>
+                            </div>
+                            <button type="button" class="toggle-row"><span class="screen-reader-text">Show more details</span></button>
+                        </td>
+                        <td class="column-description desc">
+                            <div class="plugin-description"><p><?php echo $plugin->Description ?></p></div>
+                            <div class="active second plugin-version-author-uri"><?php echo $plugin->Version ?></div>
+                        </td>
+                    </tr>
+                <?php endforeach;
+            } ?>
+            </tbody>
 
-			<tfoot>
-			<tr>
-				<td id="cb" class="manage-column column-cb check-column"><!--<label class="screen-reader-text" for="cb-select-all-1">Select All</label><input id="cb-select-all-1" type="checkbox">--></td>
-				<th scope="col" id="name" class="manage-column column-name column-primary">Plugin</th>
-				<th scope="col" id="description" class="manage-column column-description">Description</th>
-			</tr>
-			</tfoot>
+            <tfoot>
+            <tr>
+                <td id="cb" class="manage-column column-cb check-column"><!--<label class="screen-reader-text" for="cb-select-all-1">Select All</label><input id="cb-select-all-1" type="checkbox">--></td>
+                <th scope="col" id="name" class="manage-column column-name column-primary">Plugin</th>
+                <th scope="col" id="description" class="manage-column column-description">Description</th>
+            </tr>
+            </tfoot>
 
-		</table>
+        </table>
 
-		<!--<div class="tablenav bottom">
+        <!--<div class="tablenav bottom">
 
 			<div class="alignleft actions bulkactions">
 				<label for="bulk-action-selector-bottom" class="screen-reader-text">Select bulk action</label><select name="action2" id="bulk-action-selector-bottom">
@@ -129,6 +147,6 @@
 <span class="tablenav-pages-navspan" aria-hidden="true">»</span></span></div>
 			<br class="clear">
 		</div>-->
-	</form>
+    </form>
 
 </div>

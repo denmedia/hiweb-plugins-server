@@ -22,8 +22,3 @@
 	require_once 'inc/options.php';
 	require_once 'inc/hooks.php';
 	require_once 'inc/script-styles.php';
-
-
-	//todo
-    $plugins = hiweb_plugins_server()->host()->plugins();
-	hiweb()->console( $plugins );
