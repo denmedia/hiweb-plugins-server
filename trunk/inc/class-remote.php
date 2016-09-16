@@ -24,16 +24,17 @@
 		 * false → Сервер установлен, но выключен
 		 * true → Сервер запущен и готов к работе
 		 * @param null $url
+		 * @param bool $textual
 		 * @return int
 		 */
-		public function get_status( $url = null, $textual = false ){
+		public function status( $url = null, $textual = false ){
 			if( !is_string( $url ) ){
 				$url = get_option( HW_PLUGINS_SERVER_OPTIONS_REMOTE_URL, false );
 			}
 			if( !is_string( $url ) || strpos( $url, 'http' ) !== 0 ){
 				return $textual ? 'NO CONNECT' : - 1;
 			}
-			$response = file_get_contents( rtrim( $url, '/\\' ) . '/wp-admin/admin-ajax.php?action=hw_plugins_server_get' );
+			$response = file_get_contents( rtrim( $url, '/\\' ) . '/wp-admin/admin-ajax.php?action=hw_plugins_server' );
 			if( !is_string( $response ) ){
 				return $textual ? 'NO CONNECT: ERROR' : - 2;
 			}
@@ -80,7 +81,7 @@
 		 * @param null $url
 		 * @return int
 		 */
-		public function get_plugins( $url = null ){
+		public function plugins( $url = null ){
 			$data = $this->get_data( $url );
 			if( !isset( $data['status'] ) ){
 				return - 4;

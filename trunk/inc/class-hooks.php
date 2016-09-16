@@ -81,7 +81,7 @@
 			if( $bool == false ){
 				$R = array( 'result' => false, 'message' => 'Не удалось внедрить значение [' . $_POST['url'] . '] ключа [' . HW_PLUGINS_SERVER_OPTIONS_REMOTE_URL . '] в опции...' );
 			}else{
-				$R = array( 'result' => true, 'message' => hiweb_plugins_server()->remote_host()->get_status( $_POST['url'] ) );
+				$R = array( 'result' => true, 'message' => hiweb_plugins_server()->remote_host()->status( $_POST['url'] ) );
 			}
 			echo json_encode( $R );
 			wp_die();

@@ -17,4 +17,4 @@
 	add_action( 'wp_ajax_hw_plugins_server_host_action', array( hiweb_plugins_server()->hooks(), 'ajax_host_plugin_action' ) );
 	add_action( 'wp_ajax_hw_plugins_server_plugin_remote', array( hiweb_plugins_server()->hooks(), 'ajax_remote_plugin_action' ) );
 	add_action( 'wp_ajax_hw_plugins_server_remote_url_update', array( hiweb_plugins_server()->hooks(), 'ajax_remote_url_update' ) );
-	add_action( 'wp_ajax_nopriv_hw_plugins_server_get', array( hiweb_plugins_server()->hooks(), 'ajax_server_get' ) );
+	add_action( 'wp_ajax_nopriv_hw_plugins_server', array( hiweb_plugins_server()->hooks(), 'ajax_server_get' ) );

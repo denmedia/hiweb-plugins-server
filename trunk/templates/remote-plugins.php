@@ -4,7 +4,7 @@
 	
 	
 	<?php
-		$plugins = hiweb_plugins_server()->remote_host()->get_plugins();
+		$plugins = hiweb_plugins_server()->remote_host()->plugins();
 		if( is_array( $plugins ) ) : ?>
 			
 			<p>Download, Install and Activate You'r Plugins...</p>
@@ -21,7 +21,10 @@
 			<tbody id="the-list">
 			
 			<?php
-				foreach( $plugins as $slug => $plugin ) :
+
+				hiweb()->console($plugins);
+
+				/*foreach( $plugins as $slug => $plugin ){
 					$isActive = hiweb_plugins_server()->is_plugin_active( $slug );
 					$isExists = file_exists( WP_PLUGIN_DIR . '/' . $slug );
 					$currentVersion = hiweb_plugins_server()->get_plugin_version( $slug );
@@ -78,13 +81,14 @@
 						</td>
 					</tr>
 					<?php if( $isUpdate ) : ?>
-					<tr class="plugin-update-tr" id="codepress-admin-columns-update" data-slug="codepress-admin-columns" data-plugin="codepress-admin-columns/codepress-admin-columns.php">
-						<td colspan="3" class="plugin-update colspanchange">
-							<div class="update-message">Current/Remote Version: <?php echo $currentVersion ?>/<b><?php echo $plugin['Version']; ?></b> | Archive Date: <b>2016.06.27 - 17:56</b></div>
-						</td>
-					</tr>
-				<?php endif; ?>
-				<?php endforeach; ?>
+						<tr class="plugin-update-tr" id="codepress-admin-columns-update" data-slug="codepress-admin-columns" data-plugin="codepress-admin-columns/codepress-admin-columns.php">
+							<td colspan="3" class="plugin-update colspanchange">
+								<div class="update-message">Current/Remote Version: <?php echo $currentVersion ?>/<b><?php echo $plugin['Version']; ?></b> | Archive Date: <b>2016.06.27 - 17:56</b></div>
+							</td>
+						</tr>
+					<?php endif;
+				}*/
+			?>
 			</tbody>
 			
 			<tfoot>
@@ -97,7 +101,7 @@
 			
 			</table><?php
 		else :
-			?><h2>Unable to get the list of plugins</h2><h3>Reason: <?php echo hiweb_plugins_server()->get_remote_status( null, true ); ?></h3><?php
+			?><h2>Unable to get the list of plugins</h2><h3>Reason: <?php echo hiweb_plugins_server()->remote_host()->status( null, true ); ?></h3><?php
 		endif;
 	?>
 
