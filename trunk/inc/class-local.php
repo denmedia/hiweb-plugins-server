@@ -65,15 +65,7 @@
 		
 		public function __construct( $slug ){
 			$this->slug = $slug;
-			$pluginData = get_plugin_data( $this->path() );
-			$keys = call_user_func( 'get_object_vars', $this );
-			if( is_array( $pluginData ) ){
-				foreach( $pluginData as $key => $value ){
-					if( array_key_exists( $key, $keys ) ){
-						$this->{$key} = $value;
-					}
-				}
-			}
+			$this->data_update();
 		}
 		
 		
@@ -99,7 +91,23 @@
 			}
 			return $R;
 		}
-		
+
+
+		/**
+		 * Обновить информацию о плагине
+		 */
+		public function data_update(){
+			$pluginData = get_plugin_data( $this->path() );
+			$keys = call_user_func( 'get_object_vars', $this );
+			if( is_array( $pluginData ) ){
+				foreach( $pluginData as $key => $value ){
+					if( array_key_exists( $key, $keys ) ){
+						$this->{$key} = $value;
+					}
+				}
+			}
+		}
+
 		
 		/**
 		 * Возвращает TRUE, если плагин существует
@@ -183,24 +191,6 @@
 				return get_plugin_files( $this->slug );
 			}else{
 				return array();
-			}
-		}
-		
-		
-		/**
-		 * Разместить плагин на хосте, выполнив архивацию
-		 * @param bool $hosted
-		 * @return bool
-		 */
-		public function do_host( $hosted = true ){
-			if( $this->host()->is_exists() ){
-				$this->host()->hosted = $hosted;
-				$this->host()->data_update();
-			}else if( $this->make_archive() ){
-				$this->host()->hosted = $hosted;
-				$this->host()->data_update();
-			}else{
-				return false;
 			}
 		}
 		

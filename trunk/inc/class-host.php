@@ -22,8 +22,8 @@
 		
 		
 		public function __construct(){
-			$this->status = ! ( get_option( HW_PLUGINS_SERVER_OPTIONS_STATUS, '0' ) == '0' );
-			$this->kickback_status = ! ( get_option( HW_PLUGINS_SERVER_OPTIONS_KICKBACK_STATUS, '0' ) == '0' );
+			$this->status = !( get_option( HW_PLUGINS_SERVER_OPTIONS_STATUS, '0' ) == '0' );
+			$this->kickback_status = !( get_option( HW_PLUGINS_SERVER_OPTIONS_KICKBACK_STATUS, '0' ) == '0' );
 		}
 		
 		
@@ -47,7 +47,7 @@
 		 * @return bool
 		 */
 		public function toggle_status(){
-			$this->status = ! $this->status;
+			$this->status = !$this->status;
 			return $this->set_status( $this->status );
 		}
 		
@@ -72,7 +72,7 @@
 		 * @return bool
 		 */
 		public function toggle_kickback_status(){
-			$this->kickback_status = ! $this->kickback_status();
+			$this->kickback_status = !$this->kickback_status();
 			return $this->set_kickback_status( $this->kickback_status );
 		}
 		
@@ -106,7 +106,7 @@
 		 * @return hw_plugins_server_host_plugin
 		 */
 		public function plugin( $slug ){
-			if( ! isset( $this->plugins[ $slug ] ) ){
+			if( !isset( $this->plugins[ $slug ] ) ){
 				$this->plugins[ $slug ] = new hw_plugins_server_host_plugin( $slug );
 			}
 			return $this->plugins[ $slug ];
@@ -155,6 +155,7 @@
 			if( preg_match( '/(.zip)$/i', $slug ) > 0 ){
 				$infoFile = preg_replace( '/(.zip)$/i', '.json', $slug );
 				if( file_exists( $infoFile ) ){
+					$this->id = preg_replace( '/(.zip)$/i', '', basename( $slug ) );
 					$this->data_load( $infoFile );
 					$this->id = md5( $this->slug );
 				}else{
@@ -167,6 +168,9 @@
 				$this->slug = $slug;
 				$this->id = md5( $this->slug );
 				$this->data_load();
+			}
+			if( !$this->is_exists() || ( $this->is_exists() && !$this->is_exists( true ) ) ){
+				$this->data_update_from_local();
 			}
 		}
 		
@@ -193,10 +197,10 @@
 		 * @return array|mixed|object|string
 		 */
 		public function data_load( $infoFilePath = false ){
-			if( ! is_string( $infoFilePath ) ){
+			if( !is_string( $infoFilePath ) ){
 				$infoFilePath = $this->path( true );
 			}
-			if( is_file( $infoFilePath ) && is_readable( $infoFilePath ) && filesize( $this->path( true ) ) < HW_PLUGINS_SERVER_HOST_INFO_FILE_LIMIT ){
+			if( file_exists( $infoFilePath ) && is_file( $infoFilePath ) && is_readable( $infoFilePath ) && filesize( $this->path( true ) ) < HW_PLUGINS_SERVER_HOST_INFO_FILE_LIMIT ){
 				$info = @file_get_contents( $infoFilePath );
 				$info = @json_decode( $info, true );
 				if( json_last_error() == JSON_ERROR_NONE ){
@@ -218,15 +222,76 @@
 			}
 			return false;
 		}
+
+
+		/**
+		 * Обновить информацию о плагине из локального плагина
+		 */
+		private function data_update_from_local(){
+			if( !$this->local()->is_exists() ){
+				return false;
+			}
+			///
+			$pluginData = $this->local()->data();
+			$keys = call_user_func( 'get_object_vars', $this );
+			if( is_array( $pluginData ) ){
+				foreach( $pluginData as $key => $value ){
+					if( array_key_exists( $key, $keys ) ){
+						$this->{$key} = $value;
+					}
+				}
+			}
+		}
 		
 		
 		/**
 		 * Записать данные в инфо-файл
+		 * @return bool
 		 */
 		public function data_update(){
 			$data = $this->data();
 			$infoPath = $this->path( true );
-			return file_put_contents( $infoPath, json_encode( $data ) );
+			return file_put_contents( $infoPath, json_encode( $data ) ) != false;
+		}
+
+
+		/**
+		 * Обновить архив плагина с локального
+		 * @return bool
+		 */
+		public function do_update(){
+			if( !$this->local()->is_exists() )
+				return false;
+			return hiweb_plugins_server()->make_archive( $this->slug );
+		}
+
+
+		/**
+		 * Разместить плагин на хосте. Если его не существует, предварительно создать архив
+		 * @param bool $update - попутно обновить архив
+		 * @return bool
+		 */
+		public function do_host( $update = true ){
+			if( $update || !$this->is_exists() ){
+				if( !$this->do_update() )
+					return false;
+			}
+			///
+			$this->hosted = true;
+			return $this->data_update();
+		}
+
+
+		/**
+		 * Убрать с размещения, с возможностью удаления архива
+		 * @param bool $remove - попутно удвалить архив
+		 * @return bool
+		 */
+		public function do_unhost( $remove = true ){
+			if( $remove )
+				return $this->remove();
+			$this->hosted = false;
+			return $this->data_update();
 		}
 		
 		
@@ -245,7 +310,8 @@
 		 * @return string
 		 */
 		public function file_name( $infoFile = false ){
-			return $this->id . ( $infoFile ? '.json' : '.zip' );
+			$R = $this->id . ( $infoFile ? '.json' : '.zip' );
+			return $R;
 		}
 		
 		
@@ -288,10 +354,11 @@
 		
 		/**
 		 * Возвращает TRUE, если плагин существует
+		 * @param bool $infoFile - проверить существование инфо-файла
 		 * @return bool
 		 */
-		public function is_exists(){
-			$path = $this->path();
+		public function is_exists( $infoFile = false ){
+			$path = $this->path( $infoFile );
 			return ( file_exists( $path ) && is_readable( $path ) );
 		}
 		
@@ -301,7 +368,7 @@
 		 * @return bool|int
 		 */
 		public function install(){
-			if( ! $this->is_exists() ){
+			if( !$this->is_exists() ){
 				return false;
 			}
 			///Unpack

@@ -9,7 +9,7 @@
 		define( 'HW_PLUGINS_SERVER_DIR', dirname( dirname( __FILE__ ) ) );
 	}
 	if( ! defined( 'HW_PLUGINS_SERVER_DIR_URL' ) ){
-		define( 'HW_PLUGINS_SERVER_DIR_URL', rtrim( plugin_dir_url( __FILE__ ), '/' ) );
+		define( 'HW_PLUGINS_SERVER_DIR_URL', rtrim( plugin_dir_url( dirname(__FILE__) ), '/' ) );
 	}
 	if( ! defined( 'HW_PLUGINS_SERVER_DIR_TEMPLATES' ) ){
 		define( 'HW_PLUGINS_SERVER_DIR_TEMPLATES', HW_PLUGINS_SERVER_DIR . '/templates' );

@@ -8,7 +8,7 @@ jQuery(document).ready(function ($) {
         var plugin = $(this).closest('[data-plugin]').attr('data-plugin');
         var action = $(this).attr('data-click');
         $.ajax({
-            url: ajaxurl + '?action=hw_plugins_server_plugin_hosted',
+            url: ajaxurl + '?action=hw_plugins_server_host_action',
             type: 'post',
             data: {plugin: plugin, do: action},
             dataType: 'json',

@@ -1,10 +1,10 @@
 <?php _hw_plugins_server_script( '/templates/options-page' ); ?>
 <div id="hw_plugins_server_options">
 	<h1>hiWeb Plugins Client / Server Settings</h1>
-
+	
 	<table class="form-table">
 		<tbody>
-
+		
 		<tr>
 			<th scope="row">
 				Client Status : <code><?php echo hiweb_plugins_server()->remote_host()->get_status( null, true ); ?></code>
@@ -16,14 +16,14 @@
 				<p class="description">Enter server address, after that press "Update Button"</p>
 			</td>
 		</tr>
-
+		
 		<tr>
 			<th scope="row">
 				Server Status : <code><?php echo hiweb_plugins_server()->host()->status() ? 'ON' : 'OFF' ?></code>
 				<p class="description">Server. can connect to other customers (other plugins hiWeb Plugins Server) from remote sites to the server.</p>
 			</th>
 			<td id="front-static-pages">
-				<?php if ( hiweb_plugins_server()->host()->status() ) : ?>
+				<?php if( hiweb_plugins_server()->host()->status() ) : ?>
 					<button class="button" id="hw_plugins_server_status_toggle">STOP LOCAL SERVER</button>
 					<a href="admin.php?page=<?php echo HW_PLUGINS_SERVER_PAGE_SLUG ?>" class="button button-primary">ADMIN SERVER</a>
 				<?php else: ?>
@@ -32,7 +32,7 @@
 				<p class="description">Press on button for start / stop server</p>
 			</td>
 		</tr>
-
+		
 		<tr>
 			<th scope="row">
 				Kickback. Allow to take remote plugins : <code><?php echo hiweb_plugins_server()->host()->kickback_status() ? 'ENABLE' : 'DISABLE' ?></code>
@@ -40,11 +40,11 @@
 					unpacking and installing plug-ins.</p>
 			</th>
 			<td id="front-static-pages">
-				<?php if ( ! hiweb_plugins_server()->host()->status() ) : ?>
+				<?php if( ! hiweb_plugins_server()->host()->status() ) : ?>
 					<button class="button button-primary-disabled" disabled>Unable to enable.</button>
 					<p class="description">Start server first, after that enable KICKBACK</p>
 				<?php else: ?>
-					<?php if ( ! hiweb_plugins_server()->host()->kickback_status() ) : ?>
+					<?php if( ! hiweb_plugins_server()->host()->kickback_status() ) : ?>
 						<button class="button button-primary" id="hw_plugins_server_kickback_status_toggle">ENABLE KICKBACK</button>
 						<p class="description">Press on button for enable / disable server kickback</p>
 					<?php else: ?>
@@ -54,7 +54,7 @@
 				<?php endif; ?>
 			</td>
 		</tr>
-
+		
 		</tbody>
 	</table>
 </div>
