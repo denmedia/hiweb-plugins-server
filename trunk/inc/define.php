@@ -6,13 +6,13 @@
 	 * Time: 15:35
 	 */
 	if( ! defined( 'HW_PLUGINS_SERVER_DIR' ) ){
-		define( 'HW_PLUGINS_SERVER_DIR', dirname( __FILE__ ) );
+		define( 'HW_PLUGINS_SERVER_DIR', dirname( dirname( __FILE__ ) ) );
 	}
 	if( ! defined( 'HW_PLUGINS_SERVER_DIR_URL' ) ){
 		define( 'HW_PLUGINS_SERVER_DIR_URL', rtrim( plugin_dir_url( __FILE__ ), '/' ) );
 	}
 	if( ! defined( 'HW_PLUGINS_SERVER_DIR_TEMPLATES' ) ){
-		define( 'HW_PLUGINS_SERVER_DIR_TEMPLATES', dirname( __FILE__ ) . '/templates' );
+		define( 'HW_PLUGINS_SERVER_DIR_TEMPLATES', HW_PLUGINS_SERVER_DIR . '/templates' );
 	}
 	if( ! defined( 'HW_PLUGINS_SERVER_OPTIONS_STATUS' ) ){
 		define( 'HW_PLUGINS_SERVER_OPTIONS_STATUS', 'hw_plugins_server_status' );
