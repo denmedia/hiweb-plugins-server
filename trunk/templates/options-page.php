@@ -40,11 +40,11 @@
 					unpacking and installing plug-ins.</p>
 			</th>
 			<td id="front-static-pages">
-				<?php if( ! hiweb_plugins_server()->host()->status() ) : ?>
+				<?php if( !hiweb_plugins_server()->host()->status() ) : ?>
 					<button class="button button-primary-disabled" disabled>Unable to enable.</button>
 					<p class="description">Start server first, after that enable KICKBACK</p>
 				<?php else: ?>
-					<?php if( ! hiweb_plugins_server()->host()->kickback_status() ) : ?>
+					<?php if( !hiweb_plugins_server()->host()->kickback_status() ) : ?>
 						<button class="button button-primary" id="hw_plugins_server_kickback_status_toggle">ENABLE KICKBACK</button>
 						<p class="description">Press on button for enable / disable server kickback</p>
 					<?php else: ?>

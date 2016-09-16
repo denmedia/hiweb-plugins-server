@@ -13,7 +13,8 @@
 		add_submenu_page( 'options-general.php', 'hiWeb Server Settings', 'hiWeb Plugins Server', 'activate_plugins', HW_PLUGINS_SERVER_OPTIONS_PAGE_SLUG, '_hw_plugins_server_options_settings' );
 		add_submenu_page( 'plugins.php', 'hiWeb Remote Plugins', 'hiWeb Remote Plugins', 'activate_plugins', HW_PLUGINS_SERVER_REMOTE_PAGE_SLUG, '_hw_plugins_server_remote_page' );
 		if( hiweb_plugins_server()->host()->status() ){
-			add_menu_page( 'Plugins Server', 'Plugins Server', 'activate_plugins', HW_PLUGINS_SERVER_PAGE_SLUG, '_hw_plugins_server_page', 'dashicons-list-view' );
+			$count = count( hiweb_plugins_server()->plugins_compare_local_host() );
+			add_menu_page( 'Plugins Server', 'Plugins Server' . ( $count > 0 ? ' <span class="update-plugins count-' . $count . '"><span class="plugin-count">' . $count . '</span></span>' : '' ), 'activate_plugins', HW_PLUGINS_SERVER_PAGE_SLUG, '_hw_plugins_server_page', 'dashicons-list-view' );
 		}
 	}
 	

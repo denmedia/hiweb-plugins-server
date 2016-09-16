@@ -29,7 +29,7 @@
 		 * @return hw_plugins_server_local_plugin
 		 */
 		public function plugin( $slug ){
-			if( ! isset( $this->plugins[ $slug ] ) ){
+			if( !isset( $this->plugins[ $slug ] ) ){
 				$data = isset( $this->wp_plugins[ $slug ] ) ? $this->wp_plugins[ $slug ] : array();
 				$this->plugins[ $slug ] = new hw_plugins_server_local_plugin( $slug, $data );
 			}
@@ -91,8 +91,8 @@
 			}
 			return $R;
 		}
-
-
+		
+		
 		/**
 		 * Обновить информацию о плагине
 		 */
@@ -107,7 +107,7 @@
 				}
 			}
 		}
-
+		
 		
 		/**
 		 * Возвращает TRUE, если плагин существует
@@ -138,7 +138,7 @@
 			require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
 			$active_plugins = get_option( 'active_plugins' );
 			if( $active ){
-				if( ! isset( $active_plugins[ $this->slug ] ) ){
+				if( !isset( $active_plugins[ $this->slug ] ) ){
 					return activate_plugin( $this->slug );
 				}
 			}elseif( isset( $active_plugins[ $this->slug ] ) ){
@@ -203,12 +203,12 @@
 			$this->deactivate();
 			$path = $this->path( true );
 			$this->removeDir( $path );
-			return ! file_exists( $path );
+			return !file_exists( $path );
 		}
 		
 		
 		private function removeDir( $path ){
-			if( ! file_exists( $path ) || ! is_dir( $path ) ){
+			if( !file_exists( $path ) || !is_dir( $path ) ){
 				return;
 			}
 			$dirs = array( $path );

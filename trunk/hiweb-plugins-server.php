@@ -8,7 +8,7 @@
 	Author URI: http://hiweb.moscow
 	*/
 	if( !function_exists( 'hiweb_plugins_server' ) ) :
-
+		
 		function hiweb_plugins_server(){
 			static $class;
 			if( !$class instanceof hw_plugins_server ){
@@ -16,7 +16,7 @@
 			}
 			return $class;
 		}
-
+		
 		require_once 'inc/define.php';
 		require_once 'inc/class.php';
 		require_once 'inc/class-host.php';

@@ -18,7 +18,7 @@ jQuery(document).ready(function ($) {
                 }
             },
             error: function (data) {
-                console.error(data);
+                $('.wrap')[0].outerHTML = data.responseText;
             }
         });
     });

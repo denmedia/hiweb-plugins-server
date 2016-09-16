@@ -35,11 +35,15 @@
 				case 'unhost':
 					$R = hiweb_plugins_server()->host()->plugin( $slug )->do_unhost( false );
 					break;
+				case 'update':
+					$R = hiweb_plugins_server()->host()->plugin( $slug )->do_update();
+					break;
 				case 'install':
 					$R = hiweb_plugins_server()->host()->plugin( $slug )->install();
 					break;
 				default:
 					$R = false;
+					break;
 			}
 			ob_start();
 			_hw_plugins_server_page();

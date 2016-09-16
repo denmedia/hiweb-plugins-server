@@ -80,6 +80,21 @@
 		
 		
 		/**
+		 * Возвращает массив плагинов с несовпадающими версиями
+		 * @return array
+		 */
+		public function plugins_compare_local_host(){
+			$plugins = $this->plugins();
+			$R = array();
+			foreach( $plugins as $slug => $plugin ){
+				if( $this->compare_version_local_host( $slug ) == 1 )
+					$R[ $slug ] = $plugin;
+			}
+			return $R;
+		}
+		
+		
+		/**
 		 * Создать архив плагина
 		 * @param $slug
 		 * @param bool $replace_host_plugin
@@ -94,22 +109,18 @@
 			$pluginFiles = $local_plugin->files();
 			///get host plugin
 			$host_plugin = $this->host()->plugin( $slug );
-			if( $host_plugin->is_exists() && !$replace_host_plugin ){
-				return $host_plugin;
-			}
-			$host_plugin->remove();
-			///MAKE ARCHIVE
 			if( file_exists( $host_plugin->path() ) ){
-				@unlink( $host_plugin->path() );
+				if( $replace_host_plugin )
+					@unlink( $host_plugin->path() );else return true;
 			}
+			///MAKE ARCHIVE
 			$zip = new ZipArchive();
 			$B = $zip->open( $host_plugin->path(), ZipArchive::CREATE | ZipArchive::OVERWRITE );
 			if( $B ){
 				foreach( $pluginFiles as $file ){
 					$path = WP_PLUGIN_DIR . '/' . $file;
-					if( !is_dir( $path ) ){
+					if( !is_dir( $path ) )
 						$zip->addFile( $path, $file );
-					}
 				}
 				$zip->close();
 				///MAKE INFO
@@ -119,8 +130,8 @@
 				return false;
 			}
 		}
-
-
+		
+		
 		/**
 		 * Сравнить версии плагина
 		 * @param $slug

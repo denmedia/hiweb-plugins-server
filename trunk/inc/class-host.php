@@ -222,8 +222,8 @@
 			}
 			return false;
 		}
-
-
+		
+		
 		/**
 		 * Обновить информацию о плагине из локального плагина
 		 */
@@ -251,10 +251,10 @@
 		public function data_update(){
 			$data = $this->data();
 			$infoPath = $this->path( true );
-			return file_put_contents( $infoPath, json_encode( $data ) ) != false;
+			return @file_put_contents( $infoPath, json_encode( $data ) ) != false;
 		}
-
-
+		
+		
 		/**
 		 * Обновить архив плагина с локального
 		 * @return bool
@@ -262,26 +262,27 @@
 		public function do_update(){
 			if( !$this->local()->is_exists() )
 				return false;
-			return hiweb_plugins_server()->make_archive( $this->slug );
+			///
+			if( !hiweb_plugins_server()->make_archive( $this->slug ) )
+				return false;
+			///
+			$this->Version = $this->local()->Version;
+			return $this->data_update();
 		}
-
-
+		
+		
 		/**
 		 * Разместить плагин на хосте. Если его не существует, предварительно создать архив
 		 * @param bool $update - попутно обновить архив
 		 * @return bool
 		 */
 		public function do_host( $update = true ){
-			if( $update || !$this->is_exists() ){
-				if( !$this->do_update() )
-					return false;
-			}
-			///
 			$this->hosted = true;
-			return $this->data_update();
+			if( $update || !$this->is_exists() )
+				return $this->do_update();else return $this->data_update();
 		}
-
-
+		
+		
 		/**
 		 * Убрать с размещения, с возможностью удаления архива
 		 * @param bool $remove - попутно удвалить архив
@@ -300,7 +301,7 @@
 		 * @return bool
 		 */
 		public function is_hosted(){
-			return $this->hosted;
+			return $this->is_exists() && $this->hosted;
 		}
 		
 		
@@ -388,6 +389,7 @@
 		 * @return bool
 		 */
 		public function remove(){
+			$this->hosted = false;
 			@unlink( $this->path( true ) );
 			return @unlink( $this->path() );
 		}
