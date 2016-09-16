@@ -3,7 +3,7 @@
 	Plugin Name: hiWeb Plugins Server
 	Plugin URI: http://hiweb.moscow/plugins-server
 	Description: Create your own plug-ins server. Создай свой собственный сервер плагинов.
-	Version: 2...
+	Version: 2.0.0.0
 	Author: Den Media
 	Author URI: http://hiweb.moscow
 	*/

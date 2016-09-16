@@ -7,7 +7,7 @@
 		
 		<tr>
 			<th scope="row">
-				Client Status : <code><?php echo hiweb_plugins_server()->remote_host()->status( null, true ); ?></code>
+				Client Status : <code><?php echo hiweb_plugins_server()->remote()->status( null, true ); ?></code>
 				<p class="description">A client that connects to the server. After connecting the plug-ins can be downloaded from the remote server.</p>
 			</th>
 			<td id="front-static-pages">

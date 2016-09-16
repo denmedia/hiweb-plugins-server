@@ -1,7 +1,9 @@
 <?php
 	_hw_plugins_server_script( '/templates/server-page' );
-	$plugins = hiweb_plugins_server()->plugins();
-	$hostedPlugins = hiweb_plugins_server()->host()->plugins();
+	$pluginsAll = hiweb_plugins_server()->plugins();
+	$hostedPlugins = hiweb_plugins_server()->host()->plugins( true );
+	$updatePlugins = hiweb_plugins_server()->plugins_compare_local_host();
+	$unhostedPlugins = hiweb_plugins_server()->host()->plugins( - 1 );
 	
 	$action_buttons = array(
 		'put' => '<a href="#" data-click="host" title="Make Archive file and put them on You\'r Repository"><i class="dashicons dashicons-plus-alt"></i> Put On Host</a>',
@@ -13,6 +15,20 @@
 		'reinstall' => '<a href="#" data-click="install" title="Re-Install local WordPress plugin from Archive file"><i class="dashicons dashicons-controls-repeat"></i> Re-Install</a>',
 		'download' => '<a href="%s" title="Download Archive Plugin File To You\'r PC..." target="_blank"><i class="dashicons dashicons-download"></i> Download To PC</a>'
 	);
+	$pluginsStatus = isset( $_GET['plugin_status'] ) ? $_GET['plugin_status'] : 'all';
+	switch( $pluginsStatus ){
+		case 'hosted':
+			$plugins = $hostedPlugins;
+			break;
+		case 'unhosted':
+			$plugins = $unhostedPlugins;
+			break;
+		case 'upgrade':
+			$plugins = $updatePlugins;
+			break;
+		default:
+			$plugins = $pluginsAll;
+	}
 
 ?>
 <div class="wrap">
@@ -21,10 +37,22 @@
 	
 	<h2 class="screen-reader-text">Filter plugins list</h2>
 	<ul class="subsubsub">
-		<li class="all"><a href="plugins.php?plugin_status=all" class="current">All <span class="count">(<?php echo count( $hostedPlugins ) . ' / ' . count( $plugins ); ?>)</span></a> | ...</li>
-		<!--<li class="hosted"><a href="plugins.php?plugin_status=active">Hosted <span class="count">(2)</span></a> |</li>
-		<li class="unhosted"><a href="plugins.php?plugin_status=inactive">Unhosted <span class="count">(16)</span></a> |</li>
-		<li class="upgrade"><a href="plugins.php?plugin_status=upgrade">Update Available <span class="count">(1)</span></a></li>-->
+		<li class="all"><a href="<?php echo self_admin_url( 'admin.php?page=hiweb-plugins-server&plugin_status=all' ); ?>" class="<?php echo $pluginsStatus == 'all' ? 'current' : ''; ?>">All <span
+					class="count">(<?php echo count( $hostedPlugins ) . ' / ' . count( $pluginsAll ); ?>)
+				</span></a></li>
+		<?php if( count( $hostedPlugins ) > 0 ) : ?>
+			<li class="hosted"> | <a href="<?php echo self_admin_url( 'admin.php?page=hiweb-plugins-server&plugin_status=hosted' ); ?>" class="<?php echo $pluginsStatus == 'hosted' ? 'current' : ''; ?>">Hosted <span
+						class="count">(<?php echo count( $hostedPlugins ) . ' / ' . count( $pluginsAll ) ?>)</span></a></li>
+		<?php endif; ?>
+		<?php if( count( $unhostedPlugins ) > 0 ) : ?>
+			<li class="unhosted"> | <a href="<?php echo self_admin_url( 'admin.php?page=hiweb-plugins-server&plugin_status=unhosted' ); ?>" class="<?php echo $pluginsStatus == 'unhosted' ? 'current' : ''; ?>">Unhosted <span
+						class="count">(<?php echo count( $unhostedPlugins ) . ' / ' . count( $pluginsAll ) ?>)</span></a>
+			</li>
+		<?php endif; ?>
+		<?php if( count( $updatePlugins ) > 0 ) : ?>
+			<li class="upgrade"> | <a href="<?php echo self_admin_url( 'admin.php?page=hiweb-plugins-server&plugin_status=upgrade' ); ?>" class="<?php echo $pluginsStatus == 'upgrade' ? 'current' : ''; ?>">Update Available <span
+						class="count">(<?php echo count( $updatePlugins ) . ' / ' . count( $pluginsAll ) ?>)</span></a></li>
+		<?php endif; ?>
 	</ul>
 	<!--<form method="get">
 		<p class="search-box">

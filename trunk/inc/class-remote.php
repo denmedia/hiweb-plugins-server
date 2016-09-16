@@ -11,7 +11,74 @@
 	 * Класс для работы с удаленным хостом
 	 * Class hiweb_plugins_server_remote_host
 	 */
-	class hw_plugins_server_remote_host{
+	class hw_plugins_server_remote{
+		
+		private $url;
+		/** @var bool|array */
+		private $data = false;
+		private $connect;
+		private $status = 0;
+		private $status_text = 'No connect: Status = 0!';
+		/** @var  array|hw_plugins_server_remote_plugin[] */
+		private $plugins = array();
+		/** @var string */
+		private $version;
+		/** @var string */
+		private $url_root;
+		
+		
+		public function __construct( $url = null ){
+			if( !is_string( $url ) )
+				$this->url = get_option( HW_PLUGINS_SERVER_OPTIONS_REMOTE_URL, false );
+			$this->connect();
+		}
+		
+		
+		public function connect(){
+			if( is_null( $this->connect ) ){
+				if( !is_string( $this->url ) || strpos( $this->url, 'http' ) !== 0 ){
+					$this->status = - 1;
+					$this->status_text = 'NO CONNECT: URL ERROR';
+					return false;
+				}else{
+					///
+					$response = @file_get_contents( rtrim( $this->url, '/\\' ) . '/wp-admin/admin-ajax.php?action=hw_plugins_server' );
+					///
+					if( !is_string( $response ) ){
+						$this->status = - 2;
+						$this->status_text = 'NO CONNECT: ERROR';
+						return false;
+					}else{
+						///
+						$data = json_decode( $response, true );
+						///
+						if( json_last_error() != 0 ){
+							$this->status = - 3;
+							$this->status_text = 'NO CONNECT: RESPONSE IS NOT JSON';
+						}elseif( !is_array( $data ) ){
+							$this->status = - 4;
+							$this->status_text = 'NO CONNECT: RESPONSE NOT CONTAIN DATA';
+						}elseif( !isset( $data['status'] ) ){
+							$this->status = - 5;
+							$this->status_text = 'NO CONNECT: STATUS NOT EXISTS';
+						}else{
+							$this->status = (int)$data['status'];
+							$this->status_text = 'Connected: All Is OK!';
+							$this->data = $data;
+							if( isset( $data['plugins'] ) && is_array( $data['plugins'] ) )
+								foreach( $data['plugins'] as $slug => $plugin ){
+									$this->plugins[ $slug ] = new hw_plugins_server_remote_plugin( $slug, $plugin );
+								}
+							if( isset( $data['version'] ) )
+								$this->version = $data['varsion'];
+							if( isset( $data['url_root'] ) )
+								$this->url_root = $data['url_root'];
+						}
+					}
+				}
+			}
+			return $this->data;
+		}
 		
 		
 		/**
@@ -23,118 +90,99 @@
 		 * -4 → Ошибка в результатах ответа от сервера
 		 * false → Сервер установлен, но выключен
 		 * true → Сервер запущен и готов к работе
-		 * @param null $url
 		 * @param bool $textual
 		 * @return int
 		 */
-		public function status( $url = null, $textual = false ){
-			if( !is_string( $url ) ){
-				$url = get_option( HW_PLUGINS_SERVER_OPTIONS_REMOTE_URL, false );
-			}
-			if( !is_string( $url ) || strpos( $url, 'http' ) !== 0 ){
-				return $textual ? 'NO CONNECT' : - 1;
-			}
-			$response = file_get_contents( rtrim( $url, '/\\' ) . '/wp-admin/admin-ajax.php?action=hw_plugins_server' );
-			if( !is_string( $response ) ){
-				return $textual ? 'NO CONNECT: ERROR' : - 2;
-			}
-			$data = json_decode( $response, true );
-			if( json_last_error() != 0 ){
-				return $textual ? 'NO CONNECT: RESPONSE IS NOT JSON' : - 3;
-			}
-			if( !isset( $data['status'] ) ){
-				return $textual ? 'NO CONNECT: STATUS NOT EXISTS' : - 4;
-			}
-			return $textual ? ( $data['status'] ? 'CONNECT' : 'CONNECT: SERVER is OFF' ) : $data['status'];
+		public function status( $textual = false ){
+			return $textual ? $this->status_text : $this->status;
 		}
 		
 		
 		/**
-		 * Возвращает данные от удаленного сервера, либо значение ошибки
-		 * @param null $url
-		 * @return array|int|mixed|object
+		 * Возвращает массив удаленных плагинов
+		 * @return array|hw_plugins_server_remote_plugin[]
 		 */
-		public function get_data( $url = null ){
-			if( !is_string( $url ) ){
-				$url = get_option( HW_PLUGINS_SERVER_OPTIONS_REMOTE_URL, false );
-			}
-			if( !is_string( $url ) || strpos( $url, 'http' ) !== 0 ){
-				return - 1;
-			}
-			$response = file_get_contents( rtrim( $url, '/\\' ) . '/wp-admin/admin-ajax.php?action=hw_plugins_server_get' );
-			if( !is_string( $response ) ){
-				return - 2;
-			}
-			$data = json_decode( $response, true );
-			if( json_last_error() != 0 ){
-				return - 3;
-			}
-			if( !isset( $data['status'] ) ){
-				return - 4;
-			}
-			return $data;
+		public function plugins(){
+			return $this->plugins;
 		}
-		
-		
+
+
 		/**
-		 * Возвращает
-		 * @param null $url
-		 * @return int
-		 */
-		public function plugins( $url = null ){
-			$data = $this->get_data( $url );
-			if( !isset( $data['status'] ) ){
-				return - 4;
-			}
-			if( $data['status'] != true ){
-				return $data['status'];
-			}else{
-				return $data['plugins'];
-			}
-		}
-		
-		
-		/**
-		 * Выполнить загрузку архива с сервера на локальный сайт по слугу
+		 * Возвращает удаленный плагин
 		 * @param $slug
-		 * @param null $url
-		 * @return bool|int
+		 * @return hw_plugins_server_remote_plugin
 		 */
-		public function download( $slug, $url = null ){
-			$remote_plugins = $this->get_remote_data( $url );
-			if( !is_array( $remote_plugins ) ){
-				return - 1;
+		public function plugin( $slug ){
+			if( !isset( $this->plugins[ $slug ] ) ){
+				$this->plugins[ $slug ] = new hw_plugins_server_remote_plugin( $slug );
 			}
-			if( !$remote_plugins['status'] ){
-				return - 2;
-			}
-			if( !isset( $remote_plugins['plugins'][ $slug ] ) ){
-				return - 3;
-			}
-			$remote_plugin = $remote_plugins['plugins'][ $slug ];
-			if( !isset( $remote_plugin['archive_name'] ) || trim( $remote_plugin['archive_name'] ) == '' ){
-				return - 4;
-			}
-			$url = $remote_plugins['archives_url'] . '/' . $remote_plugin['archive_name'];
-			///Download
-			$raw = file_get_contents( $url );
-			$local_archive = WP_PLUGIN_DIR . '/' . $remote_plugin['archive_name'];
-			file_put_contents( $local_archive, $raw );
-			///Unpack
-			$zip = new ZipArchive;
-			$res = $zip->open( $local_archive );
-			if( $res !== true ){
-				return - 5;
-			}
-			$R = $zip->extractTo( WP_PLUGIN_DIR );
-			$zip->close();
-			///
-			return $R ? true : - 6;
+			return $this->plugins[ $slug ];
 		}
 		
 	}
 	
 	
-	class hw_plugins_server_remote_client{
+	class hw_plugins_server_remote_plugin{
+		
+		public $slug;
+		public $Name;
+		public $Description;
+		public $Version;
+		public $hosted;
+		public $url;
+		public $url_info;
+		public $file_name;
+		public $filemtime;
+
+		
+		public function __construct( $slug, $data = array() ){
+			$this->slug = $slug;
+			$vars = call_user_func( 'get_object_vars', $this );
+			foreach( $vars as $key => $var ){
+				if( isset( $data[ $key ] ) )
+					$this->{$key} = $data[ $key ];
+			}
+		}
+
+
+		/**
+		 * Возвращает массив данных
+		 * @return mixed
+		 */
+		public function data(){
+			return call_user_func( 'get_object_vars', $this );
+		}
+
+
+		/**
+		 * Возвращает TRUE, если данные архива переданы
+		 * @return bool
+		 */
+		public function is_exist(){
+			return strpos( $this->url, 'http' ) === 0 && strpos( $this->url_info, 'http' ) === 0;
+		}
+
+
+		/**
+		 * Выполнить загрузку архива с сервера на локальный сайт
+		 * @return bool|int
+		 */
+		public function download(){
+			if( !$this->is_exist() )
+				return false;
+			///Download
+			$raw = file_get_contents( $this->url );
+			$local_archive = WP_PLUGIN_DIR . '/' . $this->file_name;
+			file_put_contents( $local_archive, $raw );
+			///Unpack
+			$zip = new ZipArchive;
+			if( $zip->open( $local_archive ) != true )
+				return false;
+			$R = $zip->extractTo( WP_PLUGIN_DIR );
+			$zip->close();
+			@unlink( $local_archive );
+			///
+			return $R ? true : - 6;
+		}
 		
 	}

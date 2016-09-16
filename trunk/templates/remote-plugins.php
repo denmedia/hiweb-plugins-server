@@ -4,8 +4,10 @@
 	
 	
 	<?php
-		$plugins = hiweb_plugins_server()->remote_host()->plugins();
-		if( is_array( $plugins ) ) : ?>
+
+		$plugins = hiweb_plugins_server()->remote()->plugins();
+
+		if( count( $plugins ) > 0 ) : ?>
 			
 			<p>Download, Install and Activate You'r Plugins...</p>
 			
@@ -22,13 +24,11 @@
 			
 			<?php
 
-				hiweb()->console($plugins);
-
-				/*foreach( $plugins as $slug => $plugin ){
-					$isActive = hiweb_plugins_server()->is_plugin_active( $slug );
-					$isExists = file_exists( WP_PLUGIN_DIR . '/' . $slug );
-					$currentVersion = hiweb_plugins_server()->get_plugin_version( $slug );
-					$isUpdate = ( $isExists && ( $currentVersion != $plugin['Version'] ) );
+				foreach( $plugins as $slug => $plugin ){
+					$isActive = hiweb_plugins_server()->local()->plugin( $slug )->is_active();
+					$isExists = hiweb_plugins_server()->local()->plugin( $slug )->is_exists();
+					$currentVersion = hiweb_plugins_server()->local()->plugin( $slug )->Version;
+					$isUpdate = ( hiweb_plugins_server()->compare_version_local_host( $slug ) === 1 );
 					$trClass = array();
 					$trClass[] = $isExists ? 'active' : 'inactive';
 					if( $isUpdate ){
@@ -36,10 +36,11 @@
 					}
 					?>
 					<tr class="<?php echo implode( ' ', $trClass ); ?>" data-slug="<?php echo dirname( $slug ) ?>" data-plugin="<?php echo $slug ?>">
-						<th scope="row" class="check-column"><label class="screen-reader-text" for="checkbox_<?php echo md5( $slug ) ?>">Select <?php echo $plugin['Title']; ?></label>
+						<th scope="row" class="check-column"><label class="screen-reader-text" for="checkbox_<?php echo md5( $slug ) ?>">Select <?php echo $plugin->Name; ?></label>
 							<!--<input type="checkbox" name="checked[]" value="<?php echo $slug ?>" id="checkbox_<?php echo md5( $slug ) ?>">-->
 						</th>
-						<td class="plugin-title column-primary"><strong><?php echo $plugin['Title']; ?></strong>
+						<td class="plugin-title column-primary"><strong><?php echo $plugin->Name; ?></strong>
+							<div class="active second plugin-version-author-uri"><?php echo $plugin->Version; ?></div>
 							<div class="row-actions visible">
                             <span class="hosted">
                                 <?php if( $isExists ) : ?>
@@ -70,24 +71,19 @@
 							<button type="button" class="toggle-row"><span class="screen-reader-text">Show more details</span></button>
 						</td>
 						<td class="column-description desc">
-							<div class="plugin-description"><p><?php echo $plugin['Description']; ?></p></div>
-							<div class="active second plugin-version-author-uri"><?php echo $plugin['Version']; ?> | By <?php if( trim( $plugin['AuthorURI'] ) != '' ) : ?>
-								<a href="<?php echo $plugin['AuthorURI'] ?>">
-									<?php endif;
-										echo $plugin['AuthorName'];
-										if( trim( $plugin['AuthorURI'] ) != '' ) : ?>
-								</a>
-							<?php endif; ?></div>
+							<div class="plugin-description"><p><?php echo $plugin->Description; ?></p></div>
 						</td>
 					</tr>
-					<?php if( $isUpdate ) : ?>
-						<tr class="plugin-update-tr" id="codepress-admin-columns-update" data-slug="codepress-admin-columns" data-plugin="codepress-admin-columns/codepress-admin-columns.php">
+					<?php if( $isUpdate ): ?>
+						<tr class="plugin-update-tr <?php echo implode( ' ', $trClass ); ?>">
 							<td colspan="3" class="plugin-update colspanchange">
-								<div class="update-message">Current/Remote Version: <?php echo $currentVersion ?>/<b><?php echo $plugin['Version']; ?></b> | Archive Date: <b>2016.06.27 - 17:56</b></div>
+								<div class="update-message notice inline notice-warning notice-alt"><p>
+										Update Current version <?php echo $currentVersion ?> → <b><?php echo $plugin->Version; ?></b> | Archive Date: <b><?php echo date( 'Y.m.d - H:i', $plugin->filemtime ) ?></b>
+									</p></div>
 							</td>
 						</tr>
 					<?php endif;
-				}*/
+				}
 			?>
 			</tbody>
 			
@@ -101,8 +97,9 @@
 			
 			</table><?php
 		else :
-			?><h2>Unable to get the list of plugins</h2><h3>Reason: <?php echo hiweb_plugins_server()->remote_host()->status( null, true ); ?></h3><?php
+			?><h2>Unable to get the list of plugins</h2><h3>Reason: <?php echo hiweb_plugins_server()->remote()->status( true ); ?></h3><?php
 		endif;
+
 	?>
 
 

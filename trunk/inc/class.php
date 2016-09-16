@@ -37,12 +37,12 @@
 		
 		/**
 		 * Возвращает класс для работы удаленного хоста
-		 * @return hw_plugins_server_remote_host
+		 * @return hw_plugins_server_remote
 		 */
-		public function remote_host(){
+		public function remote($url = null){
 			static $class;
-			if( !$class instanceof hw_plugins_server_remote_host ){
-				$class = new hw_plugins_server_remote_host();
+			if( !$class instanceof hw_plugins_server_remote ){
+				$class = new hw_plugins_server_remote($url);
 			}
 			return $class;
 		}

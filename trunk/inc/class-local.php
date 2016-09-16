@@ -136,14 +136,13 @@
 		 */
 		public function activate( $active = true ){
 			require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
-			$active_plugins = get_option( 'active_plugins' );
+			$active_plugins = array_flip( get_option( 'active_plugins' ) );
 			if( $active ){
 				if( !isset( $active_plugins[ $this->slug ] ) ){
 					return activate_plugin( $this->slug );
 				}
-			}elseif( isset( $active_plugins[ $this->slug ] ) ){
-				deactivate_plugins( $this->slug, true );
-			}
+			}elseif( isset( $active_plugins[ $this->slug ] ) )
+				deactivate_plugins( $this->slug, false );
 			return true;
 		}
 		

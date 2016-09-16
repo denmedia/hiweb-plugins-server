@@ -57,17 +57,20 @@
 			ob_start();
 			$do = $_POST['do'];
 			$slug = $_POST['plugin'];
+			$R = false;
 			if( $do == 'download' ){
-				$R = hiweb_plugins_server()->do_remote_download_plugin( $slug, false );
+				$R = hiweb_plugins_server()->remote()->plugin( $slug )->download();
 			}
 			if( $do == 'activate' ){
-				$R = hiweb_plugins_server()->do_activate( $slug );
+				if( !hiweb_plugins_server()->local()->plugin( $slug )->is_exists() )
+					hiweb_plugins_server()->remote()->plugin( $slug )->download();
+				$R = hiweb_plugins_server()->local()->plugin( $slug )->activate();
 			}
 			if( $do == 'deactivate' ){
-				$R = hiweb_plugins_server()->do_deactivate( $slug );
+				$R = hiweb_plugins_server()->local()->plugin( $slug )->deactivate();
 			}
 			if( $do == 'remove' ){
-				$R = hiweb_plugins_server()->do_remove_plugin( $slug );
+				$R = hiweb_plugins_server()->local()->plugin( $slug )->remove();
 			}
 			_hw_plugins_server_remote_page();
 			$html = ob_get_clean();
@@ -81,7 +84,7 @@
 			if( $bool == false ){
 				$R = array( 'result' => false, 'message' => 'Не удалось внедрить значение [' . $_POST['url'] . '] ключа [' . HW_PLUGINS_SERVER_OPTIONS_REMOTE_URL . '] в опции...' );
 			}else{
-				$R = array( 'result' => true, 'message' => hiweb_plugins_server()->remote_host()->status( $_POST['url'] ) );
+				$R = array( 'result' => true, 'message' => hiweb_plugins_server()->remote()->status( $_POST['url'] ) );
 			}
 			echo json_encode( $R );
 			wp_die();
@@ -90,10 +93,17 @@
 		
 		public function ajax_server_get(){
 			$R = array(
-				'status' => hiweb_plugins_server()->host()->status(), 'archives_url' => HW_PLUGINS_SERVER_ROOT_URL, 'plugins' => array()
+				'status' => hiweb_plugins_server()->host()->status(), 'url_root' => HW_PLUGINS_SERVER_ROOT_URL, 'plugins' => array()
 			);
 			if( $R['status'] ){
-				$R['plugins'] = hiweb_plugins_server()->plugins();
+				$R['plugins'] = array();
+				foreach( hiweb_plugins_server()->host()->plugins( true ) as $slug => $plugin ){
+					$R['plugins'][ $slug ] = $plugin->data();
+					$R['plugins'][ $slug ]['url'] = $plugin->url();
+					$R['plugins'][ $slug ]['url_info'] = $plugin->url( true );
+					$R['plugins'][ $slug ]['file_name'] = $plugin->file_name();
+					$R['plugins'][ $slug ]['filemtime'] = filemtime( $plugin->path() );
+				}
 			}
 			echo json_encode( $R );
 			wp_die();

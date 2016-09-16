@@ -78,24 +78,6 @@
 		
 		
 		/**
-		 * Обновить данные архива плагина
-		 * @param $slug
-		 * @param $data
-		 * @return array|mixed|void
-		 */
-		public function update_plugin( $slug, $data ){
-			$database = $this->data();
-			if( isset( $database[ $slug ] ) ){
-				$data = array_merge( $database[ $slug ], $data );
-			}
-			$database[ $slug ] = $data;
-			$database[ $slug ]['slug'] = $slug;
-			$this->set_database( $database );
-			return $database;
-		}
-		
-		
-		/**
 		 * Возвращает данные плагина, если он есть в архиве, либо FALSE
 		 * @param $slug
 		 * @return bool|mixed
@@ -115,26 +97,24 @@
 		
 		/**
 		 * Возвращает все локальные sплагины
-		 * @return array|hw_plugins_server_local_plugin[]
+		 * @param bool $onlyHosted - только размещенные на хосте, если указать -1 - вернет неразмещенные плагины
+		 * @return array|hw_plugins_server_host_plugin[]
 		 */
-		public function plugins(){
+		public function plugins( $onlyHosted = false ){
 			$R = array();
 			foreach( scandir( HW_PLUGINS_SERVER_ROOT ) as $file ){
 				if( preg_match( '/(.zip)$/i', $file ) > 0 ){
 					$plugin = $this->plugin( HW_PLUGINS_SERVER_ROOT . '/' . $file );
-					$R[ $plugin->slug ] = $plugin;
+					if( $onlyHosted === false ){
+						$R[ $plugin->slug ] = $plugin;
+					}elseif( $onlyHosted === - 1 && !$plugin->is_hosted() ){
+						$R[ $plugin->slug ] = $plugin;
+					}elseif( $onlyHosted === true && $plugin->is_hosted() ){
+						$R[ $plugin->slug ] = $plugin;
+					}
 				}
 			}
 			return $R;
-		}
-		
-		
-		/**
-		 * Очистить информацию об арзивах
-		 * @return bool
-		 */
-		private function clear_database(){
-			return $this->set_database( array() );
 		}
 		
 		
@@ -346,10 +326,11 @@
 		
 		/**
 		 * Возвращает URL до файла архива
+		 * @param bool $infoFile - вернуть URL до инфо-файла
 		 * @return string
 		 */
-		public function url(){
-			return HW_PLUGINS_SERVER_ROOT_URL . '/' . $this->file_name();
+		public function url($infoFile = false){
+			return HW_PLUGINS_SERVER_ROOT_URL . '/' . $this->file_name($infoFile);
 		}
 		
 		
