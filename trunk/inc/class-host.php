@@ -89,7 +89,11 @@
 		 */
 		public function plugin( $slug ){
 			if( !isset( $this->plugins[ $slug ] ) ){
-				$this->plugins[ $slug ] = new hw_plugins_server_host_plugin( $slug );
+				$plugin = new hw_plugins_server_host_plugin( $slug );
+				$slug = $plugin->slug();
+				if( !isset( $this->plugins[ $slug ] ) ){
+					$this->plugins[ $slug ] = $plugin;
+				}
 			}
 			return $this->plugins[ $slug ];
 		}
@@ -104,13 +108,14 @@
 			$R = array();
 			foreach( scandir( HW_PLUGINS_SERVER_ROOT ) as $file ){
 				if( preg_match( '/(.zip)$/i', $file ) > 0 ){
-					$plugin = $this->plugin( HW_PLUGINS_SERVER_ROOT . '/' . $file );
+					$id = hiweb_plugins_server()->id( $file );
+					$plugin = $this->plugin( $id );
 					if( $onlyHosted === false ){
-						$R[ $plugin->slug ] = $plugin;
+						$R[ $plugin->id() ] = $plugin;
 					}elseif( $onlyHosted === - 1 && !$plugin->is_hosted() ){
-						$R[ $plugin->slug ] = $plugin;
+						$R[ $plugin->id() ] = $plugin;
 					}elseif( $onlyHosted === true && $plugin->is_hosted() ){
-						$R[ $plugin->slug ] = $plugin;
+						$R[ $plugin->id() ] = $plugin;
 					}
 				}
 			}
@@ -123,35 +128,41 @@
 	
 	class hw_plugins_server_host_plugin{
 		
+		private $id;
+
 		public $slug;
 		public $Name;
 		public $Description;
 		public $Version;
 		public $hosted;
-		private $id;
 		
 		
-		public function __construct( $slug ){
-			if( preg_match( '/(.zip)$/i', $slug ) > 0 ){
-				$infoFile = preg_replace( '/(.zip)$/i', '.json', $slug );
-				if( file_exists( $infoFile ) ){
-					$this->id = preg_replace( '/(.zip)$/i', '', basename( $slug ) );
-					$this->data_load( $infoFile );
-					$this->id = md5( $this->slug );
-				}else{
-					$this->id = preg_replace( '/(.zip)$/i', '', basename( $slug ) );
-					$this->slug = $this->id;
-					$this->Name = $this->id;
-					$this->data_update();
-				}
-			}elseif( preg_match( '/(.php)$/i', $slug ) > 0 ){
-				$this->slug = $slug;
-				$this->id = md5( $this->slug );
-				$this->data_load();
-			}
-			if( !$this->is_exists() || ( $this->is_exists() && !$this->is_exists( true ) ) ){
-				$this->data_update_from_local();
-			}
+		public function __construct( $id ){
+			$this->id = $id;
+			///SLUG
+			$slug = hiweb_plugins_server()->slug($id);
+			if(hiweb_plugins_server()->is_slug($slug)) $this->slug = $slug;
+			///LOAD DATA
+			$this->info_load();
+		}
+
+
+		/**
+		 * Возвращает ID
+		 * @return mixed
+		 */
+		public function id(){
+			return $this->id;
+		}
+
+
+		/**
+		 * Возвращает SLUG
+		 * @param bool $initial_slug - вернуть изначальный SLUG
+		 * @return string
+		 */
+		public function slug( $initial_slug = false ){
+			return $initial_slug ? $this->initial_slug : $this->slug;
 		}
 		
 		
@@ -161,30 +172,44 @@
 		private function local(){
 			return hiweb_plugins_server()->local()->plugin( $this->slug );
 		}
+
+
+		/**
+		 * Возвращает время модификации архива
+		 * @param string $format - формат времени, если указать FALSE - вернеться временной штамп
+		 * @return bool|int
+		 */
+		public function date( $format = 'Y.m.d - H:i' ){
+			$R = false;
+			if( $this->is_exists() )
+				$R = is_string( $format ) ? date( $format, filemtime( $this->path() ) ) : filemtime( $this->path() );
+			return $R;
+		}
 		
 		
 		/**
 		 * @return array
 		 */
-		public function data(){
+		public function info(){
 			return call_user_func( 'get_object_vars', $this );
+		}
+
+		public function info_path(){
+			return HW_PLUGINS_SERVER_ROOT.'/'.$this->id;
 		}
 		
 		
 		/**
 		 * Загружает данные из инфо-файла
-		 * @param bool $infoFilePath
 		 * @return array|mixed|object|string
 		 */
-		public function data_load( $infoFilePath = false ){
-			if( !is_string( $infoFilePath ) ){
-				$infoFilePath = $this->path( true );
-			}
+		public function info_load(){
+			$infoFilePath = $this->info_path();
 			if( file_exists( $infoFilePath ) && is_file( $infoFilePath ) && is_readable( $infoFilePath ) && filesize( $this->path( true ) ) < HW_PLUGINS_SERVER_HOST_INFO_FILE_LIMIT ){
 				$info = @file_get_contents( $infoFilePath );
 				$info = @json_decode( $info, true );
 				if( json_last_error() == JSON_ERROR_NONE ){
-					$data = $this->data();
+					$data = $this->info();
 					if( is_array( $data ) ){
 						foreach( $data as $key => $value ){
 							if( isset( $info[ $key ] ) ){
@@ -207,7 +232,7 @@
 		/**
 		 * Обновить информацию о плагине из локального плагина
 		 */
-		private function data_update_from_local(){
+		private function info_update_from_local(){
 			if( !$this->local()->is_exists() ){
 				return false;
 			}
@@ -221,6 +246,7 @@
 					}
 				}
 			}
+			return true;
 		}
 		
 		
@@ -228,10 +254,11 @@
 		 * Записать данные в инфо-файл
 		 * @return bool
 		 */
-		public function data_update(){
-			$data = $this->data();
+		public function info_write(){
+			$data = $this->info();
 			$infoPath = $this->path( true );
-			return @file_put_contents( $infoPath, json_encode( $data ) ) != false;
+			preg_replace( "/\\\\u([a-f0-9]{4})/e", "iconv('UCS-4LE','UTF-8',pack('V', hexdec('U$1')))", json_encode( $data ) );
+			return @file_put_contents( $infoPath, $data ) != false;
 		}
 		
 		
@@ -247,7 +274,7 @@
 				return false;
 			///
 			$this->Version = $this->local()->Version;
-			return $this->data_update();
+			return $this->info_write();
 		}
 		
 		
@@ -259,7 +286,7 @@
 		public function do_host( $update = true ){
 			$this->hosted = true;
 			if( $update || !$this->is_exists() )
-				return $this->do_update();else return $this->data_update();
+				return $this->do_update();else return $this->info_write();
 		}
 		
 		
@@ -272,7 +299,7 @@
 			if( $remove )
 				return $this->remove();
 			$this->hosted = false;
-			return $this->data_update();
+			return $this->info_write();
 		}
 		
 		
@@ -291,8 +318,7 @@
 		 * @return string
 		 */
 		public function file_name( $infoFile = false ){
-			$R = $this->id . ( $infoFile ? '.json' : '.zip' );
-			return $R;
+			return $this->file_name . ( $infoFile ? '.json' : '.zip' );
 		}
 		
 		
@@ -329,8 +355,8 @@
 		 * @param bool $infoFile - вернуть URL до инфо-файла
 		 * @return string
 		 */
-		public function url($infoFile = false){
-			return HW_PLUGINS_SERVER_ROOT_URL . '/' . $this->file_name($infoFile);
+		public function url( $infoFile = false ){
+			return HW_PLUGINS_SERVER_ROOT_URL . '/' . $this->file_name( $infoFile );
 		}
 		
 		
