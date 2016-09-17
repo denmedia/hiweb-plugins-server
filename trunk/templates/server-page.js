@@ -15,7 +15,7 @@ jQuery(document).ready(function ($) {
             success: function (data) {
                 if (data.hasOwnProperty('html')) {
                     $('.wrap')[0].outerHTML = data.html;
-                }
+                } else console.info(data);
             },
             error: function (data) {
                 $('.wrap')[0].outerHTML = data.responseText;
