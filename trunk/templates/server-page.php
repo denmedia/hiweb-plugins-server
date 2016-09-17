@@ -10,11 +10,10 @@
 		'remove' => '<a href="#" data-click="remove" title="Remove Archive file and UnHost this Plugin from You\'r Own Repository"><i class="dashicons dashicons-dismiss"></i> Remove From Host</a>',
 		'remove_full' => '<a href="#" data-click="remove" title="Completely Remove Archive file and UnHost this Plugin from You\'r Own Repository"><i class="dashicons dashicons-dismiss"></i> Completely Remove From Site</a>',
 		'host' => '<a href="#" data-click="host" title="Place Archive file on You\'r Own Repository"><i class="dashicons dashicons-yes"></i> Host</a>', 'unhost' => '<a href="#" data-click="unhost"><i class="dashicons dashicons-no-alt"></i> UnHost</a>',
-		'update' => '<a href="#" data-click="update" title="Update Archive file on you\'r host from WordPress Plugins"><i class="dashicons dashicons-update"></i> Update</a>',
+		'update' => '<a href="#" data-click="update" title="Update Archive file on you\'r host from WordPress Plugins"><i class="dashicons dashicons-update"></i> Update Archive</a>',
 		'install' => '<a href="#" data-click="install"><i class="dashicons dashicons-lightbulb"></i> Install</a>',
-		'reinstall' => '<a href="#" data-click="install" title="Re-Install local WordPress plugin from Archive file"><i class="dashicons dashicons-controls-repeat"></i> Re-Install</a>',
-		'download' => '<a href="%s" title="Download Archive Plugin File To You\'r PC..." target="_blank"><i class="dashicons dashicons-media-archive"></i> Download Archive</a>',
-		'info' => '<a href="%s" title="View Info file..." target="_blank"><i class="dashicons dashicons-media-text"></i> Info</a>'
+		'reinstall' => '<a href="#" data-click="install" title="Re-Install local WordPress plugin from Archive file"><i class="dashicons dashicons-controls-repeat"></i> Re-Install from Archive</a>',
+		'download' => '<a href="%s" title="Download Archive Plugin File To You\'r PC..." target="_blank"><i class="dashicons dashicons-media-archive"></i> Download Archive</a>'
 	);
 	$pluginsStatus = isset( $_GET['plugin_status'] ) ? $_GET['plugin_status'] : 'all';
 	switch( $pluginsStatus ){
@@ -34,8 +33,7 @@
 ?>
 <div class="wrap">
 	<h1>Host plugins on Server
-		<!--<a href="" class="page-title-action">Host Selected Plugins</a>-->
-		<a class="page-title-action" href="<?php echo self_admin_url( 'options-general.php?page=' . HW_PLUGINS_SERVER_OPTIONS_PAGE_SLUG ) ?>" title="Setup Server">Setup Server</a>
+		<a href="<?php echo self_admin_url( 'options-general.php?page=' . HW_PLUGINS_SERVER_OPTIONS_PAGE_SLUG ) ?>" class="page-title-action">Server Settings</a>
 	</h1>
 	
 	
@@ -120,19 +118,12 @@
 					}
 					?>
 					<tr class="<?php echo implode( ' ', $class ) ?>" data-slug="<?php echo dirname( $slug ) ?>" data-plugin="<?php echo $slug ?>">
-						<th scope="row" class="check-column"><label class="screen-reader-text" for="checkbox_<?php echo md5( $slug ) ?>">Select <?php echo $plugin->Name ?></label>
+						<th scope="row" class="check-column"><label class="screen-reader-text" for="checkbox_<?php echo md5( $slug ) ?>">Select <?php echo $hostPlugin->Name; ?></label>
 							<!--<input type="checkbox" name="checked[]" value="<?php echo $slug ?>" id="checkbox_<?php echo md5( $slug ) ?>">-->
 						</th>
-						<td class="column-primary"><strong><?php echo $plugin->Name ?></strong>
+						<td class="column-primary"><strong><?php echo $hostPlugin->Name ?></strong>
 							<div
-								class="active second plugin-version-author-uri"><?php echo $plugin->Version . ( $hostPlugin->is_exists() ? ' | ' . $hostPlugin->date() : '' ) . ' ' . ( $versionNotCompare ? ' <i class="dashicons dashicons-warning" style="color: 
-								grey; cursor: pointer;" 
-								title="Local 
-								and 
-								Archive 
-								Version 
-								NOT 
-								compare: ' . $localPlugin->Version . '"></i>' : '' ) ?></div>
+								class="active second plugin-version-author-uri"><?php echo $plugin->Version . ( $versionNotCompare ? ' <i class="dashicons dashicons-warning" style="color: grey; cursor: pointer;" title="Local and Archive Version NOT compare: ' . $localPlugin->Version . '"></i>' : '' ) ?></div>
 							
 							<div class="plugin-description"><p><?php echo $plugin->Description ?></p></div>
 							<div class="row-actions visible">
@@ -164,7 +155,6 @@
 				                            endif;
 			                            }
 			                            $buttons[] = sprintf( $action_buttons['download'], $hostPlugin->url() );
-			                            $buttons[] = sprintf( $action_buttons['info'], $hostPlugin->url( true ) );
 		                            }elseif( $localPlugin->is_exists() ){
 			                            $buttons[] = $action_buttons['put'];
 		                            }

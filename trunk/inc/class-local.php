@@ -45,8 +45,7 @@
 			$R = array();
 			if( is_array( $this->wp_plugins ) ){
 				foreach( $this->wp_plugins as $slug => $plugin ){
-					$plugin = $this->plugin( $slug );
-					$R[ $plugin->id() ] = $plugin;
+					$R[ $slug ] = $this->plugin( $slug );
 				}
 			}
 			return $R;
@@ -57,8 +56,7 @@
 	
 	
 	class hw_plugins_server_local_plugin{
-
-		private $id;
+		
 		public $slug;
 		public $Name;
 		public $Description;
@@ -67,17 +65,7 @@
 		
 		public function __construct( $slug ){
 			$this->slug = $slug;
-			$this->id = hiweb_plugins_server()->id( $slug );
 			$this->data_update();
-		}
-
-
-		/**
-		 * Возвращает ID плагина
-		 * @return string
-		 */
-		public function id(){
-			return $this->id;
 		}
 		
 		

@@ -14,7 +14,7 @@
 				<input placeholder="http://example.com" name="hw_plugins_server_remote_url" value="<?php echo get_option( HW_PLUGINS_SERVER_OPTIONS_REMOTE_URL, '' ); ?>"/>
 				<button class="button button-primary" id="hw_plugins_server_remote_url_update">UPDATE</button>
 				<?php if( hiweb_plugins_server()->remote()->status() == 1 ): ?>
-					<a href="<?php echo self_admin_url('plugins.php?page='.HW_PLUGINS_SERVER_REMOTE_PAGE_SLUG) ?>" class="button">Download Plugins</a>
+					<a class="button" href="<?php echo self_admin_url( 'plugins.php?page=' . HW_PLUGINS_SERVER_REMOTE_PAGE_SLUG ) ?>">Plugin download's Page</a>
 				<?php endif; ?>
 				<p class="description">Enter server address, after that press "Update Button"</p>
 			</td>

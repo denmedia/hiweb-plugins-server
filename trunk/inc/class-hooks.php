@@ -98,7 +98,7 @@
 			if( $R['status'] ){
 				$R['plugins'] = array();
 				foreach( hiweb_plugins_server()->host()->plugins( true ) as $slug => $plugin ){
-					$R['plugins'][ $slug ] = $plugin->info();
+					$R['plugins'][ $slug ] = $plugin->data();
 					$R['plugins'][ $slug ]['url'] = $plugin->url();
 					$R['plugins'][ $slug ]['url_info'] = $plugin->url( true );
 					$R['plugins'][ $slug ]['file_name'] = $plugin->file_name();

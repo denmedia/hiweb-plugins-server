@@ -8,12 +8,7 @@
 	 * Time: 15:33
 	 */
 	class hw_plugins_server{
-
-		/** @var array Индификаторы */
-		private $ids = array();
-		private $slugs = array();
-
-
+		
 		/**
 		 * Возвращает класс для работы локального клиента
 		 * @return hw_plugins_server_local
@@ -42,15 +37,22 @@
 		
 		/**
 		 * Возвращает класс для работы удаленного хоста
-		 * @param null $url - удаленный адрес сервера с плагинами, если не указать, будет взят из настроек опций
 		 * @return hw_plugins_server_remote
 		 */
-		public function remote( $url = null ){
+		public function remote($url = null){
 			static $class;
 			if( !$class instanceof hw_plugins_server_remote ){
-				$class = new hw_plugins_server_remote( $url );
+				$class = new hw_plugins_server_remote($url);
 			}
 			return $class;
+		}
+		
+		
+		/**
+		 *
+		 */
+		public function remote_client(){
+			//todo!!!
 		}
 		
 		
@@ -75,64 +77,8 @@
 			ksort( $R );
 			return $R;
 		}
-
-
-		/**
-		 * Возвращает TRUE, если передан именно слуг, вне зависимости от существования плагина
-		 * @param $slugTest
-		 * @return bool
-		 */
-		public function is_slug( $slugTest ){
-			return ( is_string( $slugTest ) && preg_match( '/(.php)$/i', $slugTest ) > 0 );
-		}
-
-
-		/**
-		 * Возвращает ID из SLUG
-		 * @param $slugOrArchiveFile - ID, SLUG, путь или имя архива
-		 * @return string
-		 */
-		public function id( $slugOrArchiveFile ){
-			if( preg_match( '/(.zip)$/i', $slugOrArchiveFile ) > 0 ){
-				$R = preg_replace( '/(.zip)$/i', '', basename( $slugOrArchiveFile ) );
-			}elseif( preg_match( '/(.php)$/i', $slugOrArchiveFile ) > 0 ){
-				$R = md5( $slugOrArchiveFile );
-			}else $R = $slugOrArchiveFile;
-			$this->ids[ $slugOrArchiveFile ] = $R;
-			$this->slugs[ $R ] = $slugOrArchiveFile;
-			return $R;
-		}
-
-
-		/**
-		 * Возвращает массив SLUG => ID
-		 */
-		public function ids(){
-			return $this->ids;
-		}
-
-
-		/**
-		 * Возвращает SLUG ил ID
-		 * @param $id
-		 * @return string
-		 */
-		public function slug( $id ){
-			if( isset( $this->slugs[ $id ] ) )
-				return $this->slugs[ $id ];
-			return $id;
-		}
-
-
-		/**
-		 * Возвращает массив ID => SLUG
-		 * @return array
-		 */
-		public function slugs(){
-			return $this->slugs;
-		}
-
-
+		
+		
 		/**
 		 * Возвращает массив плагинов с несовпадающими версиями
 		 * @return array
@@ -161,9 +107,6 @@
 				return false;
 			}
 			$pluginFiles = $local_plugin->files();
-			///Prepare Dir
-			if( !file_exists( HW_PLUGINS_SERVER_ROOT ) )
-				@mkdir( HW_PLUGINS_SERVER_ROOT );
 			///get host plugin
 			$host_plugin = $this->host()->plugin( $slug );
 			if( file_exists( $host_plugin->path() ) ){
@@ -181,7 +124,7 @@
 				}
 				$zip->close();
 				///MAKE INFO
-				$host_plugin->info_write();
+				$host_plugin->data_update();
 				return true;
 			}else{
 				return false;

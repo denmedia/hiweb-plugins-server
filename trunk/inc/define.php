@@ -42,5 +42,5 @@
 		define( 'HW_PLUGINS_SERVER_ROOT_URL', WP_CONTENT_URL . '/hiweb-plugins-server-root' );
 	}
 	if( !defined( 'HW_PLUGINS_SERVER_HOST_INFO_FILE_LIMIT' ) ){
-		define( 'HW_PLUGINS_SERVER_HOST_INFO_FILE_LIMIT', 1024 );
+		define( 'HW_PLUGINS_SERVER_HOST_INFO_FILE_LIMIT', 1024000 );
 	}
