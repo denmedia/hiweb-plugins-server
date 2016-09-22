@@ -111,8 +111,10 @@
 		
 		
 		public function plugin_action_links( $links, $plugin ){
-			if( $plugin != 'hiweb-plugins-server/hiweb-plugins-server.php' ){
-				$links[] = '<a href=""><i class="dashicons dashicons-upload"></i> Upload To Server</a>';
+			if(hiweb_plugins_server()->remote()->status() == true){
+				if( $plugin != 'hiweb-plugins-server/hiweb-plugins-server.php' ){
+					//$links[] = '<a href=""><i class="dashicons dashicons-upload"></i> Upload To Server</a>';
+				}
 			}
 			return $links;
 		}
