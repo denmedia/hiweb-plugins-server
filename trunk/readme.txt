@@ -1,7 +1,7 @@
 === hiWeb Plugins Server ===
 Contributors: Den Media
 Donate link:
-Tags: plugins, repository, server, develop, scripts, download, multisite, multi site, sites, manager
+Tags: admin plugins, admin server, admin client, admin repository, easy server, easy download, easy plugin, easy admin, free, free plugin, free admin, free server, admin, automatic download, automatic plugin, plugins, list plugins, list, share plugin, sharing plugin, share server, sharing server, repository, server, develop, scripts, download, multisite, multi site, sites, manager
 Requires at least: 4.1
 Tested up to: 4.3
 Stable tag: 4.2.4
