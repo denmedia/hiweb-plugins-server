@@ -97,12 +97,14 @@
 		 * Обновить информацию о плагине
 		 */
 		public function data_update(){
-			$pluginData = get_plugin_data( $this->path() );
-			$keys = call_user_func( 'get_object_vars', $this );
-			if( is_array( $pluginData ) ){
-				foreach( $pluginData as $key => $value ){
-					if( array_key_exists( $key, $keys ) ){
-						$this->{$key} = $value;
+			if( $this->is_exists() ){
+				$pluginData = get_plugin_data( $this->path() );
+				$keys = call_user_func( 'get_object_vars', $this );
+				if( is_array( $pluginData ) ){
+					foreach( $pluginData as $key => $value ){
+						if( array_key_exists( $key, $keys ) ){
+							$this->{$key} = $value;
+						}
 					}
 				}
 			}

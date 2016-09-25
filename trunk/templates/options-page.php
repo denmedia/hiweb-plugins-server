@@ -36,7 +36,7 @@
 			</td>
 		</tr>
 		
-		<tr>
+		<!--<tr>
 			<th scope="row">
 				Kickback. Allow to take remote plugins : <code><?php echo hiweb_plugins_server()->host()->kickback_status() ? 'ENABLE' : 'DISABLE' ?></code>
 				<p class="description">Allow remote clients to upload their plugins. These plug-ins will be packaged in the archive file and can not be started automatically or via the URL-request. To unpack the plugin, you must go to the section for
@@ -56,7 +56,7 @@
 					<?php endif; ?>
 				<?php endif; ?>
 			</td>
-		</tr>
+		</tr>-->
 		
 		</tbody>
 	</table>
