@@ -21,18 +21,18 @@ This plugin allows you to organize storage of archived plugins current site.
 
 = Setting up the client sites for download plugins from you'r own server =
 
- -. Go to "Settings → hiWeb Plugins Server"
- -. Enter the address of a site on WordPress, where you installed the plugin "hiWeb Plugins Server", working in the "server" mod.
- -. Click on the "Update" button.
- -. If the server is running and you are connected to it, the left will see a message about the status of the connection.
- -. After a successful connection, you can go to the list of remote plugins, where you can download them on the current site. Go to "Plugins → hiWeb Remote plugins"
+ 1. Go to "Settings → hiWeb Plugins Server"
+ 2. Enter the address of a site on WordPress, where you installed the plugin "hiWeb Plugins Server", working in the "server" mod.
+ 3. Click on the "Update" button.
+ 4. If the server is running and you are connected to it, the left will see a message about the status of the connection.
+ 5. After a successful connection, you can go to the list of remote plugins, where you can download them on the current site. Go to "Plugins → hiWeb Remote plugins"
 
 
 = Create a archive server =
 
- -. To start the server, go to "Settings → hiWeb Plugins Server" and click on the button "Start Local Server".
- -. After starting the server, go to "Plugins Server" in the admin panel. Here you can place on your server with the required plug-ins to client sites.
- -. Done! Now all the site with WordPress plugin "hiWeb Plugins Server" in "client" mode, connected to the server will be able to download featured plugins.
+ 1. To start the server, go to "Settings → hiWeb Plugins Server" and click on the button "Start Local Server".
+ 2. After starting the server, go to "Plugins Server" in the admin panel. Here you can place on your server with the required plug-ins to client sites.
+ 3. Done! Now all the site with WordPress plugin "hiWeb Plugins Server" in "client" mode, connected to the server will be able to download featured plugins.
 
 
 == Installation ==
