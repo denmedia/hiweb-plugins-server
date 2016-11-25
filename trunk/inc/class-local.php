@@ -70,14 +70,6 @@
 		
 		
 		/**
-		 * @return hw_plugins_server_host_plugin
-		 */
-		private function host(){
-			return hiweb_plugins_server()->host()->plugin( $this->slug );
-		}
-		
-		
-		/**
 		 * Возвращает данные плагина
 		 * @return array
 		 */
@@ -189,7 +181,14 @@
 		 */
 		public function files(){
 			if( $this->is_exists() ){
-				return get_plugin_files( $this->slug );
+				$R = array();
+				$iterator = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->path( true ) ), RecursiveIteratorIterator::SELF_FIRST );
+				foreach( $iterator as $file ){
+					if( $file->isFile() ){
+						$R[] = $file->getRealPath();
+					}
+				}
+				return $R;
 			}else{
 				return array();
 			}
@@ -205,6 +204,14 @@
 			$path = $this->path( true );
 			$this->removeDir( $path );
 			return !file_exists( $path );
+		}
+		
+		
+		/**
+		 * @return hw_plugins_server_host_plugin
+		 */
+		private function host(){
+			return hiweb_plugins_server()->host()->plugin( $this->slug );
 		}
 		
 		

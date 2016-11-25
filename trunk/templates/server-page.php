@@ -6,13 +6,9 @@
 	$unhostedPlugins = hiweb_plugins_server()->host()->plugins( - 1 );
 	
 	$action_buttons = array(
-		'put' => '<a href="#" data-click="host" title="Make Archive file and put them on You\'r Repository"><i class="dashicons dashicons-plus-alt"></i> Put On Host</a>',
-		'remove' => '<a href="#" data-click="remove" title="Remove Archive file and UnHost this Plugin from You\'r Own Repository"><i class="dashicons dashicons-dismiss"></i> Remove From Host</a>',
-		'remove_full' => '<a href="#" data-click="remove" title="Completely Remove Archive file and UnHost this Plugin from You\'r Own Repository"><i class="dashicons dashicons-dismiss"></i> Completely Remove From Site</a>',
-		'host' => '<a href="#" data-click="host" title="Place Archive file on You\'r Own Repository"><i class="dashicons dashicons-yes"></i> Host</a>', 'unhost' => '<a href="#" data-click="unhost"><i class="dashicons dashicons-no-alt"></i> UnHost</a>',
-		'update' => '<a href="#" data-click="update" title="Update Archive file on you\'r host from WordPress Plugins"><i class="dashicons dashicons-update"></i> Update Archive</a>',
-		'install' => '<a href="#" data-click="install"><i class="dashicons dashicons-lightbulb"></i> Install</a>',
-		'reinstall' => '<a href="#" data-click="install" title="Re-Install local WordPress plugin from Archive file"><i class="dashicons dashicons-controls-repeat"></i> Re-Install from Archive</a>',
+		'put' => '<a href="#" data-click="host" title="Make Archive file and put them on You\'r Repository"><i class="dashicons dashicons-plus-alt"></i> Put On Host</a>', 'remove' => '<a href="#" data-click="remove" title="Remove Archive file and UnHost this Plugin from You\'r Own Repository"><i class="dashicons dashicons-dismiss"></i> Remove From Host</a>',
+		'remove_full' => '<a href="#" data-click="remove" title="Completely Remove Archive file and UnHost this Plugin from You\'r Own Repository"><i class="dashicons dashicons-dismiss"></i> Completely Remove From Site</a>', 'host' => '<a href="#" data-click="host" title="Place Archive file on You\'r Own Repository"><i class="dashicons dashicons-yes"></i> Host</a>', 'unhost' => '<a href="#" data-click="unhost"><i class="dashicons dashicons-no-alt"></i> UnHost</a>',
+		'update' => '<a href="#" data-click="update" title="Update Archive file on you\'r host from WordPress Plugins"><i class="dashicons dashicons-update"></i> Update Archive</a>', 'install' => '<a href="#" data-click="install"><i class="dashicons dashicons-lightbulb"></i> Install</a>', 'reinstall' => '<a href="#" data-click="install" title="Re-Install local WordPress plugin from Archive file"><i class="dashicons dashicons-controls-repeat"></i> Re-Install from Archive</a>',
 		'download' => '<a href="%s" title="Download Archive Plugin File To You\'r PC..." target="_blank"><i class="dashicons dashicons-media-archive"></i> Download Archive</a>'
 	);
 	$pluginsStatus = isset( $_GET['plugin_status'] ) ? $_GET['plugin_status'] : 'all';

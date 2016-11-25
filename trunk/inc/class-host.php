@@ -329,8 +329,8 @@
 		 * @param bool $infoFile - вернуть URL до инфо-файла
 		 * @return string
 		 */
-		public function url($infoFile = false){
-			return HW_PLUGINS_SERVER_ROOT_URL . '/' . $this->file_name($infoFile);
+		public function url( $infoFile = false ){
+			return HW_PLUGINS_SERVER_ROOT_URL . '/' . $this->file_name( $infoFile );
 		}
 		
 		

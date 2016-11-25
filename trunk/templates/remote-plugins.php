@@ -4,9 +4,9 @@
 	
 	
 	<?php
-
+		
 		$plugins = hiweb_plugins_server()->remote()->plugins();
-
+		
 		if( count( $plugins ) > 0 ) : ?>
 			
 			<p>Download, Install and Activate You'r Plugins...</p>
@@ -23,7 +23,7 @@
 			<tbody id="the-list">
 			
 			<?php
-
+				
 				foreach( $plugins as $slug => $plugin ){
 					$isActive = hiweb_plugins_server()->local()->plugin( $slug )->is_active();
 					$isExists = hiweb_plugins_server()->local()->plugin( $slug )->is_exists();
@@ -99,7 +99,7 @@
 		else :
 			?><h2>Unable to get the list of plugins</h2><h3>Reason: <?php echo hiweb_plugins_server()->remote()->status( true ); ?></h3><?php
 		endif;
-
+	
 	?>
 
 

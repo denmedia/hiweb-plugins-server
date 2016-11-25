@@ -105,8 +105,8 @@
 		public function plugins(){
 			return $this->plugins;
 		}
-
-
+		
+		
 		/**
 		 * Возвращает удаленный плагин
 		 * @param $slug
@@ -133,7 +133,7 @@
 		public $url_info;
 		public $file_name;
 		public $filemtime;
-
+		
 		
 		public function __construct( $slug, $data = array() ){
 			$this->slug = $slug;
@@ -143,8 +143,8 @@
 					$this->{$key} = $data[ $key ];
 			}
 		}
-
-
+		
+		
 		/**
 		 * Возвращает массив данных
 		 * @return mixed
@@ -152,8 +152,8 @@
 		public function data(){
 			return call_user_func( 'get_object_vars', $this );
 		}
-
-
+		
+		
 		/**
 		 * Возвращает TRUE, если данные архива переданы
 		 * @return bool
@@ -161,8 +161,8 @@
 		public function is_exist(){
 			return strpos( $this->url, 'http' ) === 0 && strpos( $this->url_info, 'http' ) === 0;
 		}
-
-
+		
+		
 		/**
 		 * Выполнить загрузку архива с сервера на локальный сайт
 		 * @return bool|int

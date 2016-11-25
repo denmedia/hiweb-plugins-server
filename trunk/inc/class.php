@@ -39,10 +39,10 @@
 		 * Возвращает класс для работы удаленного хоста
 		 * @return hw_plugins_server_remote
 		 */
-		public function remote($url = null){
+		public function remote( $url = null ){
 			static $class;
 			if( !$class instanceof hw_plugins_server_remote ){
-				$class = new hw_plugins_server_remote($url);
+				$class = new hw_plugins_server_remote( $url );
 			}
 			return $class;
 		}
@@ -118,9 +118,9 @@
 			$B = $zip->open( $host_plugin->path(), ZipArchive::CREATE | ZipArchive::OVERWRITE );
 			if( $B ){
 				foreach( $pluginFiles as $file ){
-					$path = WP_PLUGIN_DIR . '/' . $file;
+					$path = $file;
 					if( !is_dir( $path ) )
-						$zip->addFile( $path, $file );
+						$zip->addFile( $path, str_replace(WP_PLUGIN_DIR,'',$file) );
 				}
 				$zip->close();
 				///MAKE INFO
