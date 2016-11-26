@@ -12,6 +12,8 @@ Create your own plugins repository and downloading them to their sites faster an
 
 == Description ==
 
+Video Coming Soon...
+
 If you are creating multiple sites on WordPress, and every time you need to download the same plug-ins, including paid versions - then this plugin is for you!
 This plugin allows you to organize storage of archived plugins current site.
 
