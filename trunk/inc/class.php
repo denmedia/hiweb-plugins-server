@@ -11,7 +11,7 @@
 		
 		
 		public function __construct(){
-			if( file_exists( HW_PLUGINS_SERVER_ROOT ) )
+			if( !file_exists( HW_PLUGINS_SERVER_ROOT ) )
 				mkdir( HW_PLUGINS_SERVER_ROOT, 0755 );
 		}
 		
