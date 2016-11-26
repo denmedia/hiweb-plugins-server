@@ -9,6 +9,13 @@
 	 */
 	class hw_plugins_server{
 		
+		
+		public function __construct(){
+			if( file_exists( HW_PLUGINS_SERVER_ROOT ) )
+				mkdir( HW_PLUGINS_SERVER_ROOT, 0755 );
+		}
+		
+		
 		/**
 		 * Возвращает класс для работы локального клиента
 		 * @return hw_plugins_server_local
@@ -120,7 +127,7 @@
 				foreach( $pluginFiles as $file ){
 					$path = $file;
 					if( !is_dir( $path ) )
-						$zip->addFile( $path, str_replace(WP_PLUGIN_DIR,'',$file) );
+						$zip->addFile( $path, str_replace( WP_PLUGIN_DIR, '', $file ) );
 				}
 				$zip->close();
 				///MAKE INFO
